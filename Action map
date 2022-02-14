@@ -1,0 +1,60 @@
+User
+
+-register
+-login
+-edit user
+-get USER by id
+-set isAdmin
+
+Product
+
+-add product                       (by Admin)
+-get product by id
+-edit product                      (by Admin)
+-change quantity in shop           (by Admin)
+-delete product                    (by Admin)
+-remove product from order
+-search product by name
+- get All products sorted by price
+
+Discount 
+
+-add discount
+-edit discount
+-remove discount
+-send info about discount of liked product
+
+Category
+
+-add category
+-edit category
+-delete categoty
+-get products of category
+-get sub categiries
+
+Sub_Categoty
+
+-add sub_category
+-edit sub_category
+-delete sub_categoty
+-get products of sub_category
+----------------------------------------------------
+
+Rewiew
+
+-add review
+-delete rewiew
+-edit review
+
+
+Brand
+
+-add
+-edit
+-delete
+
+Order
+
+-add
+-delete
+-remove from order
