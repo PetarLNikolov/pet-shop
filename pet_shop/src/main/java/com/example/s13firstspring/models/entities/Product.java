@@ -1,4 +1,4 @@
-package com.example.s13firstspring.models;
+package com.example.s13firstspring.models.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

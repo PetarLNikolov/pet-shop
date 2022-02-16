@@ -1,10 +1,11 @@
 package com.example.s13firstspring.services;
 
-import com.example.s13firstspring.exception.BadRequestException;
-import com.example.s13firstspring.exception.NotFoundException;
-import com.example.s13firstspring.models.Product;
-import com.example.s13firstspring.models.ProductRepository;
+import com.example.s13firstspring.exceptions.BadRequestException;
+import com.example.s13firstspring.exceptions.NotFoundException;
+import com.example.s13firstspring.models.entities.Product;
+import com.example.s13firstspring.models.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
@@ -70,7 +71,9 @@ public class ProductService {
         if(repository.findById(product.getId()) == null){
             throw new NotFoundException("Category not found");
         }
+        String name=product.getName();
         Product product1 = new Product();
+        product1.setName(name);
         repository.delete(product1);
         return product1;
     }

@@ -1,7 +1,7 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.Product;
-import com.example.s13firstspring.models.ProductRepository;
+import com.example.s13firstspring.models.entities.Product;
+import com.example.s13firstspring.models.repositories.ProductRepository;
 import com.example.s13firstspring.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
