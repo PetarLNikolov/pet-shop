@@ -1,6 +1,9 @@
 package com.example.s13firstspring.controllers;
 
 
+import com.example.s13firstspring.models.dtos.CategoryAddDTO;
+import com.example.s13firstspring.models.dtos.CategoryResponseDTO;
+import com.example.s13firstspring.models.dtos.CategoryWithSubcategoriesDTO;
 import com.example.s13firstspring.models.entities.Category;
 import com.example.s13firstspring.services.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,31 +13,33 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping
 public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
 
-    @PostMapping("/add")
-    public ResponseEntity<Category> add(@RequestBody Category category,HttpSession session, HttpServletRequest request) {
+    @PostMapping("/categories/add")
+    public ResponseEntity<CategoryResponseDTO> add(@RequestBody CategoryAddDTO category,HttpSession session, HttpServletRequest request) {
         UserController.validateLogin(session, request);
-        Category c = categoryService.add(category);
-        return ResponseEntity.ok(c);
+        return ResponseEntity.ok(categoryService.add(category));
     }
+
     //-edit discount
-    @PutMapping("/edit")
+    @PutMapping("/categories/edit")
     public ResponseEntity<Category> edit(@RequestBody Category category, HttpSession session, HttpServletRequest request) {
         UserController.validateLogin(session, request);
-        Category c = categoryService.edit(category);
-        return ResponseEntity.ok(c);
+        return ResponseEntity.ok( categoryService.edit(category));
     }
     //-remove discount
-    @DeleteMapping("/delete")
+    @DeleteMapping("/categories/delete")
     public ResponseEntity<Category>  delete(@RequestBody Category category, HttpSession session, HttpServletRequest request){
         UserController.validateLogin(session, request);
+        return ResponseEntity.accepted().body(categoryService.delete(category));
+    }
 
-        Category c=categoryService.delete(category);
-        return ResponseEntity.accepted().body(c);
+    @GetMapping("/categories/{id}")
+    public ResponseEntity<CategoryWithSubcategoriesDTO> getById(@PathVariable int id){
+        return ResponseEntity.ok(categoryService.getById(id));
     }
 }

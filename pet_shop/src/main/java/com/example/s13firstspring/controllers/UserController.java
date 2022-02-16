@@ -1,7 +1,7 @@
 package com.example.s13firstspring.controllers;
 
 import com.example.s13firstspring.exceptions.UnauthorizedException;
-import com.example.s13firstspring.models.dtos.RegisterUserDTO;
+import com.example.s13firstspring.models.dtos.UserRegisterDTO;
 import com.example.s13firstspring.models.dtos.UserResponseDTO;
 
 import com.example.s13firstspring.models.entities.User;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 
 @RestController
 public class UserController {
@@ -26,9 +25,8 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    private ArrayList<User> users = new ArrayList<>();
 
-    @PostMapping("/login")
+    @PostMapping("/users/login")
     public UserResponseDTO login(@RequestBody User user, HttpSession session, HttpServletRequest request) {
         String username = user.getUsername();
         String password = user.getPassword();
@@ -39,13 +37,12 @@ public class UserController {
         return dto;
     }
 
-    @PostMapping("/reg")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody RegisterUserDTO user) {
+    @PostMapping("/users/reg")
+    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user) {
         String username = user.getUsername();
         String password = user.getPassword();
         String confirmPassword = user.getPassword2();
         User u = userService.register(username, password, confirmPassword);
-        users.add(u);
         UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
         return ResponseEntity.ok(dto);
     }
@@ -72,7 +69,8 @@ public class UserController {
     public static void validateLogin(HttpSession session, HttpServletRequest request) {
         if (session.isNew() ||
                 (!(Boolean) session.getAttribute(LOGGED)) ||
-                (!request.getRemoteAddr().equals(session.getAttribute(LOGGED_FROM)))) {
+                (!request.getRemoteAddr().equals(session.getAttribute(LOGGED_FROM)
+                ))) {
             throw new UnauthorizedException("You have to login!");
         }
     }

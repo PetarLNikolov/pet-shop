@@ -19,7 +19,7 @@ public class DiscountController {
     private DiscountService discountService;
 
     //-add discount
-    @PostMapping("/add")
+    @PostMapping("/discounts/add")
     public ResponseEntity<Discount> add(@RequestBody Discount discount,HttpSession session, HttpServletRequest request) {
         UserController.validateLogin(session, request);
         String name = discount.getName();
@@ -30,7 +30,7 @@ public class DiscountController {
         return ResponseEntity.ok(d);
     }
     //-edit discount
-    @PutMapping("/edit")
+    @PutMapping("/discounts/edit")
     public ResponseEntity<Discount> edit(@RequestBody Discount discount, HttpSession session, HttpServletRequest request) {
         UserController.validateLogin(session, request);
 
@@ -38,11 +38,10 @@ public class DiscountController {
         return ResponseEntity.ok(d);
     }
     //-remove discount
-    @DeleteMapping("/delete")
-    public ResponseEntity<Discount>  delete(@RequestBody Discount discount, HttpSession session, HttpServletRequest request){
+    @DeleteMapping("/discounts/delete/{id}")
+    public ResponseEntity<Discount>  delete(@PathVariable long id, HttpSession session, HttpServletRequest request){
         UserController.validateLogin(session, request);
-        String name = discount.getName();
-        Discount d=discountService.delete(name);
+        Discount d=discountService.delete(id);
         return ResponseEntity.accepted().body(d);
     }
     //-send info about discount of liked product

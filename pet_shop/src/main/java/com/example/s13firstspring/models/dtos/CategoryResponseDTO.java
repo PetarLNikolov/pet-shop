@@ -1,15 +1,16 @@
 package com.example.s13firstspring.models.dtos;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-public class RegisterUserDTO {
 
-    private String username;
-    private String password;
-    private String password2;
+
+@Data
+@NoArgsConstructor
+public class CategoryResponseDTO {
+
+    private String name;
+
 }

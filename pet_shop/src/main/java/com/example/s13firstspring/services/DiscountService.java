@@ -2,7 +2,9 @@ package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
+import com.example.s13firstspring.models.dtos.ErrorDTO;
 import com.example.s13firstspring.models.entities.Discount;
+import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.models.repositories.DiscountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,13 +47,13 @@ public class DiscountService {
         return d;
     }
 
-    public Discount delete(String name) {
-        if(discountRepository.findByName(name) == null){
-            throw new BadRequestException("Discount name is invalid");
+    public Discount delete(long id) {
+        Optional<Discount> opt = discountRepository.findById(id);
+        if (opt.isPresent()) {
+             discountRepository.deleteById(id);
+             return opt.get();
+        } else {
+            throw new NotFoundException("Discount not found");
         }
-        Discount d = new Discount();
-        d.setName(name);
-        discountRepository.delete(d);
-        return d;
     }
 }

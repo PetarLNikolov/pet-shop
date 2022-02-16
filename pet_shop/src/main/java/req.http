@@ -1,1 +1,22 @@
+POST localhost:6666/discounts/add
+Content-Type: application/json
 
+{
+  "name": "Christmas_Discount",
+  "percentDiscount": 54,
+  "startOfOffer": "2022-02-15T17:45:24.020276800",
+  "endOfOffer": "2023-02-15T17:45:24.020276800"
+}
+
+### user register (imash nqkakwa drama s 405 code opravi- metod not allowed )
+POST localhost:6666/users/req
+Content-Type: application/json
+
+{
+  "first_name": "Ivan",
+  "last_name": "Georgiev",
+  "username": "ivanchoGeorgiev777",
+  "email": "ivanchoGeorgiev777@gmail.com",
+  "password": "pasolrla",
+  "phone_number": "0889894"
+}

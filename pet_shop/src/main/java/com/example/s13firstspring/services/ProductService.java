@@ -1,10 +1,12 @@
 package com.example.s13firstspring.services;
 
-import com.example.s13firstspring.exception.BadRequestException;
-import com.example.s13firstspring.exception.NotFoundException;
+
+import com.example.s13firstspring.exceptions.BadRequestException;
+import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.Product;
 import com.example.s13firstspring.models.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Optional;
