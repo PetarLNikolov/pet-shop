@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.transaction.Transactional;
 import java.util.Optional;
 
+@Service
 public class ProductService {
 
     @Autowired
