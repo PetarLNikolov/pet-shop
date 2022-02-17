@@ -1,18 +1,18 @@
-package com.example.s13firstspring.models;
+package com.example.s13firstspring.models.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.example.s13firstspring.models.entities.Delivery;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "cities")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
+
 public class City {
 
 
@@ -23,8 +23,8 @@ public class City {
     @Column
     private String city_name;
 
-    @Id
-    public Long getId() {
-        return id;
-    }
+
+    @OneToMany(mappedBy = "city")
+    private List<Delivery> deliveries;
+
 }

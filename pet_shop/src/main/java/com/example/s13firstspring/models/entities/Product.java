@@ -1,5 +1,6 @@
 package com.example.s13firstspring.models;
 
+import com.example.s13firstspring.models.entities.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,36 +18,32 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     @Column
     private String name;
     @Column
     private double price;
     @Column
     private int unitsInStock;
-    @Column
-    private int brand;// TODO
-    @Column
-    private int subCategory;//TODO
-    @Column
-    private String animal;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "brand_id")
+    private Brand brand;// TODO
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "subcategory_id")
+    private Subcategory subcategory;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "animal_id")
+    private Animal animal;
     @Column
     private String description;
     @Column
     private double rating;
     @Column
     private String imageURL;
-    @Column
-    private int discount; //percents
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(referencedColumnName = "discount_id")
+    private Discount discount; //percents
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    @Id
-    public Long getId() {
-        return id;
-    }
 
 
     // Methods for using parameters

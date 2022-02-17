@@ -33,6 +33,8 @@ public class Discount {
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime startOfOffer;
     @Column
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime endOfOffer;
     // foreign key set to products
 

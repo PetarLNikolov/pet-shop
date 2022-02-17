@@ -28,8 +28,11 @@ public class UserService {
         if (password == null || password.isBlank()) {
             throw new BadRequestException("Password is mandatory");
         }
-        User u = userRepository.findByUsernameAndPassword(username, password);
+        User u = userRepository.findByUsername(username);
         if (u == null) {
+            throw new UnauthorizedException("Wrong credentials");
+        }
+        if (!passwordEncoder.matches(password, u.getPassword())) {
             throw new UnauthorizedException("Wrong credentials");
         }
         return u;
@@ -45,8 +48,8 @@ public class UserService {
         if (password == null || password.isBlank()) {
             throw new BadRequestException("Password is mandatory");
         }
-       if(!password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")){
-           throw new BadRequestException("Password must be hairy");
+        if (!password.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}$")) {
+            throw new BadRequestException("Password must be hairy");
         }
         if (!password.equals(confirmPassword)) {
             throw new BadRequestException("Passwords mismatch");
