@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-@SpringBootApplication
+@SpringBootApplication//(exclude = { SecurityAutoConfiguration.class })  // ако имаш грешка при request пробвай
+
 public class S13FirstSpringApplication {
 
     public static void main(String[] args) {
@@ -22,4 +23,6 @@ public class S13FirstSpringApplication {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
+
 }

@@ -21,8 +21,8 @@ public class Subcategory {
     @Column
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(referencedColumnName = "id",nullable = false)
+    @ManyToOne()
+    @JoinColumn(referencedColumnName = "category_id")
     private Category category;
 
     @Override

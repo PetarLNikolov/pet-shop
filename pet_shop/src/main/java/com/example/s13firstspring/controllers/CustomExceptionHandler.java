@@ -5,11 +5,15 @@ import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
 import com.example.s13firstspring.models.dtos.ErrorDTO;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import java.util.Arrays;
+
+@ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {UnauthorizedException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
@@ -18,6 +22,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorDTO dto = new ErrorDTO();
         dto.setMsg(e.getMessage());
         dto.setStatus(HttpStatus.UNAUTHORIZED.value());
+        e.printStackTrace();
         return dto;
     }
 
@@ -28,6 +33,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorDTO dto = new ErrorDTO();
         dto.setMsg(e.getMessage());
         dto.setStatus(HttpStatus.BAD_REQUEST.value());
+        e.printStackTrace();
+
         return dto;
     }
 
@@ -38,6 +45,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorDTO dto = new ErrorDTO();
         dto.setMsg(e.getMessage());
         dto.setStatus(HttpStatus.NOT_FOUND.value());
+        e.printStackTrace();
+
         return dto;
     }
 
@@ -48,6 +57,8 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         ErrorDTO dto = new ErrorDTO();
         dto.setMsg(e.getMessage());
         dto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        e.printStackTrace();
+
         return dto;
     }
 }

@@ -5,12 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-
 @Data
 @NoArgsConstructor
-public class ErrorDTO {
+public class CategoryAddDTO {
 
-    private String msg;
-    private int status;
+    private String name;
 
 }
