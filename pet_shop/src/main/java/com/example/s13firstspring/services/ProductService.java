@@ -5,6 +5,9 @@ import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.Product;
 import com.example.s13firstspring.models.ProductRepository;
+import com.example.s13firstspring.models.dtos.ProductAddDTO;
+import com.example.s13firstspring.models.dtos.ProductResponseDTO;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,13 +19,37 @@ public class ProductService {
 
     @Autowired
     private ProductRepository repository;
+    @Autowired
+    private ModelMapper mapper;
 
-    public Product getByID(long id){
-        Optional<Product> opt = repository.findById(id);
-        if(opt.isPresent()){
-            return opt.get();
+
+    public ProductResponseDTO add(ProductAddDTO product) {
+        if (repository.findByName(product.getName()) != null) {
+            throw new BadRequestException("Product name is taken");
         }
-        else
+        if (product.getPrice() < 0) {
+            throw new BadRequestException("Product price is lower than 0");
+        }
+        if (product.getUnitsInStock() < 0) {
+            throw new BadRequestException("Product entity count lower than 0");
+        }
+        Product p = new Product();
+        p.setName(product.getName());
+        p.setPrice(product.getPrice());
+        p.setUnitsInStock(product.getUnitsInStock());
+        //p.setBrand(brandID);
+        //p.setAnimal(animal);
+        //p.setSubCategory(subcatedoryID);
+        p.setDescription(product.getDescription());
+        repository.save(p);
+        return mapper.map(p, ProductResponseDTO.class);
+    }
+
+    public Product getByID(int id) {
+        Optional<Product> opt = repository.findById(id);
+        if (opt.isPresent()) {
+            return opt.get();
+        } else
             throw new NotFoundException("Product not found");
     }
 
@@ -37,50 +64,20 @@ public class ProductService {
             throw new NotFoundException("User not found");
         }
     }
-    public Product add(String name, double price, int inStock,int brandID, int subcatedoryID, String animal, String descrtiption) {
-        if(repository.findByName(name) != null){
-            throw new BadRequestException("Product name is taken");
-        }
-        if(price<0){
-            throw new BadRequestException("Product price is lower than 0");
-        }
-        if(inStock<0){
-            throw new BadRequestException("Product entity count lower than 0");
-        }
 
-        if(brandID<0){
-            throw new BadRequestException("Product brand ID is lower than 0");
+
+    public void delete(int id) {
+        if (!repository.findById(id).isPresent()) {
+            throw new NotFoundException("Product not found");
         }
-        if(subcatedoryID<0){
-            throw new BadRequestException("Product subcategory lower than 0");
-        }
-        if(animal.trim().length()<1){
-            throw new BadRequestException("Product info for which animal not provided");
-        }
-        Product p = new Product();
-        p.setName(name);
-        p.setPrice(price);
-        p.setUnitsInStock(inStock);
-        p.setBrand(brandID);
-        p.setAnimal(animal);
-        p.setSubCategory(subcatedoryID);
-        p.setDescription(descrtiption);
-        repository.save(p);
-        return p;
+        repository.deleteById(id);
     }
-    public Product delete(Product product) {
-        if(repository.findById(product.getId()) == null){
+
+    public Product changeInStock(int id, int countOfStock) {
+        if (repository.findById(id) == null) {
             throw new NotFoundException("Category not found");
         }
-        Product product1 = new Product();
-        repository.delete(product1);
-        return product1;
-    }
-    public Product changeInStock(long id, int countOfStock){
-        if(repository.findById(id) == null){
-            throw new NotFoundException("Category not found");
-        }
-        if(countOfStock<0){
+        if (countOfStock < 0) {
             throw new BadRequestException("Stock cant be <= 0");
         }
         repository.findById(id).get().setUnitsInStock(countOfStock);
