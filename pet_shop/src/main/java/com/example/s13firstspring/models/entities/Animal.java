@@ -1,11 +1,13 @@
 package com.example.s13firstspring.models.entities;
 
+import com.example.s13firstspring.models.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "animals")
@@ -17,13 +19,12 @@ public class Animal {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
 
     @Column
     private String name;
 
-    @Id
-    public Long getId() {
-        return id;
-    }
+    @OneToMany(mappedBy = "animal")
+    private Set<Product> products;
+
 }

@@ -1,6 +1,8 @@
 package com.example.s13firstspring.controllers;
 
 
+import com.example.s13firstspring.models.dtos.DiscountAddDTO;
+import com.example.s13firstspring.models.dtos.DiscountResponseDTO;
 import com.example.s13firstspring.models.entities.Discount;
 
 import com.example.s13firstspring.services.DiscountService;
@@ -20,31 +22,27 @@ public class DiscountController {
 
     //-add discount
     @PostMapping("/discounts/add")
-    public ResponseEntity<Discount> add(@RequestBody Discount discount, HttpServletRequest request) {
+    public ResponseEntity<DiscountResponseDTO> add(@RequestBody DiscountAddDTO discount, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
-        String name = discount.getName();
-        int percentDiscount = discount.getPercentDiscount();
-        LocalDateTime startDate = discount.getStartOfOffer();
-        LocalDateTime endDate = discount.getEndOfOffer();
-        Discount d = discountService.add(name, percentDiscount, startDate, endDate);
-        return ResponseEntity.ok(d);
+        LoginUtility.isAdmin(request);
+        return ResponseEntity.ok(discountService.add(discount));
     }
 
     //-edit discount
     @PutMapping("/discounts/edit")
     public ResponseEntity<Discount> edit(@RequestBody Discount discount, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
-
+        LoginUtility.isAdmin(request);
         Discount d = discountService.edit(discount);
         return ResponseEntity.ok(d);
     }
 
     //-remove discount
     @DeleteMapping("/discounts/delete/{id}")
-    public ResponseEntity<Discount> delete(@PathVariable long id, HttpServletRequest request) {
+    public void delete(@PathVariable int id, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
-        Discount d = discountService.delete(id);
-        return ResponseEntity.accepted().body(d);
+        LoginUtility.isAdmin(request);
+        discountService.delete(id);
     }
     //-send info about discount of liked product
 }

@@ -18,41 +18,33 @@ import java.util.stream.Collectors;
 @Service
 public class CategoryService {
     @Autowired
-    CategoryRepository categoryRepository;
+    CategoryRepository repository;
     @Autowired
     ModelMapper mapper;
 
 
     public CategoryResponseDTO add(CategoryAddDTO category) {
-        if (categoryRepository.findByName(category.getName()) != null) {
+        if (repository.findByName(category.getName()) != null) {
             throw new BadRequestException("Category name already exists");
         }
         Category c = new Category();
         c.setName(category.getName());
-        categoryRepository.save(c);
+        repository.save(c);
         return mapper.map(c, CategoryResponseDTO.class);
     }
 
     @Transactional
     public Category edit(Category category) {
-        Optional<Category> opt = categoryRepository.findById((long) category.getId());
-        if (opt.isPresent()) {
-            categoryRepository.save(category);
-            return category;
-        } else {
-            throw new NotFoundException("Category not found");
-        }
+        repository.findById(category.getId()).orElseThrow(() -> new NotFoundException("Category not found"));
+        return repository.save(category);
     }
 
     public void delete(int id) {
-        if (categoryRepository.getById((long) id) == null) {
-            throw new NotFoundException("Category not found");
-        }
-        categoryRepository.deleteById((long) id);
+        repository.delete(repository.findById(id).orElseThrow(() -> new NotFoundException("Category not found")));
     }
 
     public CategoryWithSubcategoriesDTO getById(int id) {
-        Optional<Category> opt = categoryRepository.findById((long) id);
+        Optional<Category> opt = repository.findById(id);
         if (opt.isPresent()) {
             Category c = opt.get();
             CategoryWithSubcategoriesDTO dto = mapper.map(c, CategoryWithSubcategoriesDTO.class);

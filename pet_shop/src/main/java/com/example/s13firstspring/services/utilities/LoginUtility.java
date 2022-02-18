@@ -12,6 +12,7 @@ public class LoginUtility {
     public static final String IS_ADMIN = "is_admin";
     public static final String LOGGED = "logged";
     public static final String LOGGED_FROM = "logged_from";
+    public static final String USER_ID = "user_id";
 
     public static void validateLogin(HttpServletRequest request) {
 

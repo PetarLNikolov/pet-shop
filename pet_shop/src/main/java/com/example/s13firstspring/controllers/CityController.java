@@ -31,10 +31,11 @@ public class CityController {
     }
 
     //-remove discount
-    @DeleteMapping("/cities/delete")
-    public ResponseEntity<CityReturnDTO> delete(@RequestBody City city, HttpServletRequest request) {
+    @DeleteMapping("/cities/delete/{id}")
+    public void delete(@PathVariable int id, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
-        return ResponseEntity.accepted().body(cityService.delete(city));
+        LoginUtility.isAdmin(request);
+        cityService.delete(id);
     }
 
     @GetMapping("/categories/{id}")
