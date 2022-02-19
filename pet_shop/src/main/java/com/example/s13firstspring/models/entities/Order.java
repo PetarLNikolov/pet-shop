@@ -7,7 +7,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.Instant;
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "orders")
 @Data // why does it suggest other things
+@Setter
+@Getter
 @NoArgsConstructor
 public class Order {
     @Id
