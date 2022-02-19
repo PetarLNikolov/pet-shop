@@ -1,9 +1,12 @@
 package com.example.s13firstspring.models.repositories;
 
-import com.example.s13firstspring.models.entities.Product;
+import com.example.s13firstspring.models.Product;
+
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ProductRepository extends JpaRepository<com.example.s13firstspring.models.Product, Integer> {
+@Repository
+public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    com.example.s13firstspring.models.Product findByName(String name);
+    Product findByName(String name);
 }

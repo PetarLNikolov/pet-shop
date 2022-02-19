@@ -3,14 +3,17 @@ package com.example.s13firstspring.controllers;
 import com.example.s13firstspring.models.dtos.UserRegisterDTO;
 import com.example.s13firstspring.models.dtos.UserResponseDTO;
 
+import com.example.s13firstspring.models.entities.Discount;
 import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.services.UserService;
 import com.example.s13firstspring.services.utilities.LoginUtility;
+import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +27,12 @@ public class UserController {
     private UserService userService;
     @Autowired
     private ModelMapper modelMapper;
+
+    @GetMapping
+    public ResponseEntity<String> notifyDiscountChange(Discount discount) {
+        //TODO execute on each product and fix the responsebody
+        return ResponseEntity.status(418).body("Your product is on sale  "+ discount.getPercentDiscount()+" % OFF");
+    }
 
 
     @PostMapping("/users/login")
@@ -68,6 +77,13 @@ public class UserController {
     public void logout(HttpSession session, HttpServletResponse response) {
         session.invalidate();
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
+    }
+
+    @SneakyThrows
+    @PostMapping("/users/image")
+    public String uploadProfileImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request){
+        LoginUtility.validateLogin(request);
+        return userService.uploadFile(file, request);
     }
 
 

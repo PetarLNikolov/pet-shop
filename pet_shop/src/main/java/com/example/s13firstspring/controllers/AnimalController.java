@@ -1,46 +1,38 @@
 package com.example.s13firstspring.controllers;
 
+
+import com.example.s13firstspring.models.dtos.AnimalAddDTO;
+import com.example.s13firstspring.models.dtos.AnimalResponseDTO;
 import com.example.s13firstspring.models.entities.Animal;
-import com.example.s13firstspring.models.entities.Category;
-import com.example.s13firstspring.models.entities.Discount;
-import com.example.s13firstspring.models.entities.Product;
 import com.example.s13firstspring.models.repositories.AnimalRepository;
 import com.example.s13firstspring.services.AnimalService;
+import com.example.s13firstspring.services.utilities.LoginUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 public class AnimalController {
 
         @Autowired
-        private AnimalRepository animalRepository;
+        private AnimalService service;
 
-        @Autowired
-        private AnimalService animalService;
+        @PostMapping("/animals/add")
+        public ResponseEntity<AnimalResponseDTO> addAnimal(@RequestBody AnimalAddDTO animal, HttpServletRequest request) {
+            LoginUtility.validateLogin(request);
+            LoginUtility.isAdmin(request);
 
-        @PostMapping("/animals")
-        public Animal addAnimal(@RequestBody Animal animal) {
-            animalRepository.save(animal);
-            return animal;
+            return ResponseEntity.ok(service.add(animal));
         }
-    //-remove animal
-    @DeleteMapping("/delete")
-    public ResponseEntity<Animal> delete(@RequestBody Animal animal, HttpSession session, HttpServletRequest request){
-      UserController.validateLogin(session, request);
 
-        String name = animal.getName();
-        Animal a= animalService.delete(name);
-        return ResponseEntity.accepted().body(a);
+    @DeleteMapping("/animals/delete/{id}")
+    public void delete(@PathVariable int id, HttpServletRequest request) {
+        LoginUtility.validateLogin(request);
+        LoginUtility.isAdmin(request);
+        service.delete(id);
     }
-    //-edit animal
-    @PutMapping("/edit")
-    public ResponseEntity<Animal> edit(@RequestBody Animal animal, HttpSession session, HttpServletRequest request) {
-        UserController.validateLogin(session, request);
-        Animal a=animalService.edit(animal);
-        return ResponseEntity.ok(a);
-    }
+
+
 }

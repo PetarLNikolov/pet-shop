@@ -1,59 +1,59 @@
 package com.example.s13firstspring.services;
 
+import com.example.s13firstspring.controllers.UserController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.ErrorDTO;
+import com.example.s13firstspring.models.dtos.DiscountAddDTO;
+import com.example.s13firstspring.models.dtos.DiscountResponseDTO;
 import com.example.s13firstspring.models.entities.Discount;
-import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.models.repositories.DiscountRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 public class DiscountService {
     @Autowired
-    private DiscountRepository discountRepository;
+    private DiscountRepository repository;
+    @Autowired
+    ModelMapper mapper;
+    @Autowired
+    UserController userController;
 
     @Transactional
     public Discount edit(Discount discount) {
-        Optional<Discount> opt = discountRepository.findById(discount.getId());
-        if (opt.isPresent()) {
-            discountRepository.save(discount);
-            return discount;
-        } else {
-            throw new NotFoundException("Discount not found");
-        }
+        repository.findById(discount.getId()).orElseThrow(() -> new NotFoundException("Discount not found"));
+        userController.notifyDiscountChange(discount);
+        validation(mapper.map(discount,DiscountAddDTO.class));
+        return repository.save(discount);
     }
 
-    public Discount add(String name, int percentDiscount, LocalDateTime startDate, LocalDateTime endDate) {
-        if(discountRepository.findByName(name) != null){
+    public DiscountResponseDTO add(DiscountAddDTO discount) {
+        validation(discount);
+        Discount d = new Discount();
+        d.setName(discount.getName());
+        d.setStartOfOffer(discount.getStartOfOffer());
+        d.setEndOfOffer(discount.getEndOfOffer());
+        repository.save(d);
+        return mapper.map(d, DiscountResponseDTO.class);
+    }
+
+    public void delete(int id) {
+        repository.delete(repository.findById(id).orElseThrow(() -> new NotFoundException("Discount not found")));
+    }
+
+    public void validation(DiscountAddDTO discount){
+        if (repository.findByName(discount.getName()) != null) {
             throw new BadRequestException("Discount name is taken");
         }
-        if(startDate.isBefore(LocalDateTime.now())||startDate.isAfter(endDate)){ // subject to change
+        if (discount.getStartOfOffer().isBefore(LocalDateTime.now()) || discount.getStartOfOffer().isAfter(discount.getEndOfOffer())) { // subject to change
             throw new BadRequestException("Discount dates are invalid");
         }
-        if(percentDiscount<=0||percentDiscount>=100){
+        if (discount.getPercentDiscount() <= 0 || discount.getPercentDiscount() >= 100) {
             throw new BadRequestException("Discount percentage is invalid");
-        }
-        Discount d = new Discount();
-        d.setName(name);
-        d.setStartOfOffer(startDate);
-        d.setEndOfOffer(endDate);
-        discountRepository.save(d);
-        return d;
-    }
-
-    public Discount delete(long id) {
-        Optional<Discount> opt = discountRepository.findById(id);
-        if (opt.isPresent()) {
-             discountRepository.deleteById(id);
-             return opt.get();
-        } else {
-            throw new NotFoundException("Discount not found");
         }
     }
 }

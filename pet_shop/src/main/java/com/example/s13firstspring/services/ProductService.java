@@ -4,14 +4,14 @@ package com.example.s13firstspring.services;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.Product;
-import com.example.s13firstspring.models.ProductRepository;
+import com.example.s13firstspring.models.dtos.ProductEditUnitsDTO;
+import com.example.s13firstspring.models.repositories.ProductRepository;
 import com.example.s13firstspring.models.dtos.ProductAddDTO;
 import com.example.s13firstspring.models.dtos.ProductResponseDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.Optional;
 
 @Service
@@ -33,38 +33,18 @@ public class ProductService {
         if (product.getUnitsInStock() < 0) {
             throw new BadRequestException("Product entity count lower than 0");
         }
-        Product p = new Product();
-        p.setName(product.getName());
-        p.setPrice(product.getPrice());
-        p.setUnitsInStock(product.getUnitsInStock());
-        //p.setBrand(brandID);
-        //p.setAnimal(animal);
-        //p.setSubCategory(subcatedoryID);
-        p.setDescription(product.getDescription());
+        Product p =mapper.map(product,Product.class);
         repository.save(p);
         return mapper.map(p, ProductResponseDTO.class);
     }
 
-    public Product getByID(int id) {
-        Optional<Product> opt = repository.findById(id);
-        if (opt.isPresent()) {
-            return opt.get();
-        } else
+    public ProductResponseDTO get(String name) {
+        Product product=repository.findByName(name); //TODO findByName- optional so you can call orElse throw exception
+        if(product==null){
             throw new NotFoundException("Product not found");
-    }
-
-    @Transactional
-    public Product edit(Product product) {
-        Optional<Product> opt = repository.findById(product.getId());
-        if (opt.isPresent()) {
-            repository.save(product);//update users set ..... where id = user.getId
-            //commentRepository.deleteAll(user.getComments());
-            return product;
-        } else {
-            throw new NotFoundException("User not found");
         }
+        return mapper.map(product, ProductResponseDTO.class);
     }
-
 
     public void delete(int id) {
         if (!repository.findById(id).isPresent()) {
@@ -73,14 +53,19 @@ public class ProductService {
         repository.deleteById(id);
     }
 
-    public Product changeInStock(int id, int countOfStock) {
-        if (repository.findById(id) == null) {
-            throw new NotFoundException("Category not found");
-        }
+    public ProductResponseDTO changeInStock(int id, int countOfStock) {
         if (countOfStock < 0) {
-            throw new BadRequestException("Stock cant be <= 0");
+            throw new BadRequestException("Stock cant be less than 0");
         }
-        repository.findById(id).get().setUnitsInStock(countOfStock);
-        return repository.findById(id).get();
+        Product p=repository.findById(id).orElseThrow(()->new BadRequestException("Product not found"));
+        p.setUnitsInStock(countOfStock);
+        repository.save(p);
+        return mapper.map(p,ProductResponseDTO.class);
+    }
+
+    public ProductResponseDTO edit(Product p) {
+        Product p1=repository.findById(p.getId()).orElseThrow(()-> new BadRequestException("Product not found"));
+        repository.save(p1);
+        return mapper.map(p1,ProductResponseDTO.class);
     }
 }

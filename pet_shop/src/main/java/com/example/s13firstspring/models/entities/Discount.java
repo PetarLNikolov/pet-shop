@@ -1,5 +1,6 @@
 package com.example.s13firstspring.models.entities;
 
+import com.example.s13firstspring.models.Product;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
@@ -12,6 +13,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "discounts")
@@ -23,7 +25,7 @@ public class Discount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     @Column
     private String name;
     @Column
@@ -36,8 +38,8 @@ public class Discount {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime endOfOffer;
-    // foreign key set to products
-
+    @OneToMany(mappedBy="discount")
+    private Set<Product> products;
 
     @Override
     public String toString() {

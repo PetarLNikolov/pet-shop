@@ -27,7 +27,7 @@ public class Product {
     private int unitsInStock;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "brand_id")
-    private Brand brand;// TODO
+    private Brand brand;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "subcategory_id")
     private Subcategory subcategory;
@@ -42,11 +42,6 @@ public class Product {
     private String imageURL;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(referencedColumnName = "discount_id")
-    private Discount discount; //percents
-
-
-
-    // Methods for using parameters
-
+    private Discount discount;
 
 }
