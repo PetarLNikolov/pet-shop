@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "images")
@@ -18,17 +19,18 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
-    private String image_URL;
-    @Column
-    private int productID;
+    private String imageURL;
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
 
 
     @Override
     public String toString() {
         return "Image{" +
                 "id=" + id +
-                ", image_URL='" + image_URL + '\'' +
-                ", productID=" + productID +
+                ", image_URL='" + imageURL + '\'' +
+                ", products" + product +
                 '}';
     }
 }

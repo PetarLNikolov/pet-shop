@@ -1,6 +1,5 @@
 package com.example.s13firstspring.models.entities;
 
-import com.example.s13firstspring.models.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,13 +18,13 @@ public class Brand {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
 
     @Column
-    private String brandName;
+    private String name;
 
     @Column
-    private String imageURL;
+    private String logoUrl;
 
     @OneToMany(mappedBy = "brand")
     Set<Product> products;

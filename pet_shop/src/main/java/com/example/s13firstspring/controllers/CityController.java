@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 public class CityController {
@@ -38,7 +37,7 @@ public class CityController {
         cityService.delete(id);
     }
 
-    @GetMapping("/categories/{id}")
+    @GetMapping("/cities/{id}")
     public ResponseEntity<CityWithDeliveriesDTO> getById(@PathVariable int id) {
         return ResponseEntity.ok(cityService.getById(id));
     }

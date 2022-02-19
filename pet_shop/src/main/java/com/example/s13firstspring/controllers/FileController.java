@@ -16,7 +16,7 @@ public class FileController {
     @SneakyThrows
     @GetMapping("/files/{filename}")
     public void download(@PathVariable String filename, HttpServletResponse response){
-        File f = new File("uploads" + File.separator + filename);
+        File f = new File("images" + File.separator + filename);
         if(!f.exists()){
             throw new NotFoundException("File does not exist");
         }

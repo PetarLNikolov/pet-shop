@@ -1,6 +1,5 @@
 package com.example.s13firstspring.models.entities;
 
-import com.example.s13firstspring.models.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,11 +1,11 @@
 package com.example.s13firstspring.models.dtos;
 
-
 import lombok.Data;
 
 
 @Data
 public class ProductAddDTO {
+    //TODO add all fields
 
     private String name;
 

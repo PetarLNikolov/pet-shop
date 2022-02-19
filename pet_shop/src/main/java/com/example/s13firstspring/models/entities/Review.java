@@ -29,7 +29,7 @@ public class Review {
     @JsonDeserialize(using= LocalDateTimeDeserializer.class )
     private LocalDateTime createdAt;
     @ManyToOne()
-    @JoinColumn(referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
 

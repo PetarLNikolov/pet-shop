@@ -1,18 +1,26 @@
 package com.example.s13firstspring.services;
 
 
+import com.example.s13firstspring.controllers.ImageController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.Product;
-import com.example.s13firstspring.models.dtos.ProductEditUnitsDTO;
+import com.example.s13firstspring.models.entities.Image;
+import com.example.s13firstspring.models.entities.Product;
+import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.models.repositories.ProductRepository;
 import com.example.s13firstspring.models.dtos.ProductAddDTO;
 import com.example.s13firstspring.models.dtos.ProductResponseDTO;
+import com.example.s13firstspring.services.utilities.LoginUtility;
+import lombok.SneakyThrows;
+import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.nio.file.Files;
 
 @Service
 public class ProductService {
@@ -21,6 +29,8 @@ public class ProductService {
     private ProductRepository repository;
     @Autowired
     private ModelMapper mapper;
+    @Autowired
+    private ImageController imageController;
 
 
     public ProductResponseDTO add(ProductAddDTO product) {
@@ -33,14 +43,14 @@ public class ProductService {
         if (product.getUnitsInStock() < 0) {
             throw new BadRequestException("Product entity count lower than 0");
         }
-        Product p =mapper.map(product,Product.class);
+        Product p = mapper.map(product, Product.class);
         repository.save(p);
         return mapper.map(p, ProductResponseDTO.class);
     }
 
     public ProductResponseDTO get(String name) {
-        Product product=repository.findByName(name); //TODO findByName- optional so you can call orElse throw exception
-        if(product==null){
+        Product product = repository.findByName(name); //TODO findByName- optional so you can call orElse throw exception
+        if (product == null) {
             throw new NotFoundException("Product not found");
         }
         return mapper.map(product, ProductResponseDTO.class);
@@ -57,15 +67,28 @@ public class ProductService {
         if (countOfStock < 0) {
             throw new BadRequestException("Stock cant be less than 0");
         }
-        Product p=repository.findById(id).orElseThrow(()->new BadRequestException("Product not found"));
+        Product p = repository.findById(id).orElseThrow(() -> new BadRequestException("Product not found"));
         p.setUnitsInStock(countOfStock);
         repository.save(p);
-        return mapper.map(p,ProductResponseDTO.class);
+        return mapper.map(p, ProductResponseDTO.class);
     }
 
     public ProductResponseDTO edit(Product p) {
-        Product p1=repository.findById(p.getId()).orElseThrow(()-> new BadRequestException("Product not found"));
+        Product p1 = repository.findById(p.getId()).orElseThrow(() -> new BadRequestException("Product not found"));
         repository.save(p1);
-        return mapper.map(p1,ProductResponseDTO.class);
+        return mapper.map(p1, ProductResponseDTO.class);
+    }
+
+    @SneakyThrows
+    public String uploadFile(MultipartFile file, HttpServletRequest request,int productID) {
+
+        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+        String name = System.nanoTime() + "." + extension;
+        Files.copy(file.getInputStream(), new File("images" + File.separator + name).toPath());
+        Product p= repository.getById(productID);
+        Image i = imageController.add(name, p);
+        p.getImages().add(i);
+        repository.save(p);
+        return i.getImageURL();
     }
 }

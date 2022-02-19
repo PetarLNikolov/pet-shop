@@ -29,9 +29,9 @@ public class User {
     @Column
     private String email;
     @Column
-    private String password;
-    @Column
     private String phoneNumber;
+    @Column
+    private String password;
     @JsonSerialize(using= LocalDateSerializer.class)
     @JsonDeserialize(using= LocalDateDeserializer.class )
     private Date dateOfBirth;
@@ -39,8 +39,6 @@ public class User {
     private boolean isAdmin=false; //TODO    (true - false to MySQL 0-1)
     @OneToMany(mappedBy="user")
     private Set<Review> reviews;
-    @OneToMany(mappedBy = "product")
-    private Set<Image> images;
 
 
 }

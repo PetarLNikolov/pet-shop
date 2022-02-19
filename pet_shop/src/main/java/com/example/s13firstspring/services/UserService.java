@@ -5,15 +5,18 @@ import com.example.s13firstspring.controllers.UserController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
+import com.example.s13firstspring.models.dtos.UserRegisterDTO;
 import com.example.s13firstspring.models.entities.Image;
 import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.utilities.LoginUtility;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +34,8 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ImageController imageController;
+    @Autowired
+    private ModelMapper mapper;
 
 
     public User login(String username, String password) {
@@ -50,7 +55,10 @@ public class UserService {
         return u;
     }
 
-    public User register(String username, String password, String confirmPassword) {
+    public User register(UserRegisterDTO user) {
+        String username= user.getUsername();
+        String password=user.getPassword();
+        String confirmPassword=user.getPassword2();
         if (username == null || username.isBlank()) {
             throw new BadRequestException("Username is mandatory");
         }
@@ -75,8 +83,7 @@ public class UserService {
         if (repository.findByUsername(username) != null) {
             throw new BadRequestException("User already exists");
         }
-        User u = new User();
-        u.setUsername(username);
+        User u = mapper.map(user,User.class);
         u.setPassword(passwordEncoder.encode(password));
         repository.save(u);
         return u;
@@ -91,17 +98,6 @@ public class UserService {
         return repository.save(getById(user.getId()));
     }
 
-    @SneakyThrows
-    public String uploadFile(MultipartFile file, HttpServletRequest request) {
-        int loggedUserId = (int) request.getSession().getAttribute(LoginUtility.USER_ID);
-        String extension = FilenameUtils.getExtension(file.getOriginalFilename());
-        String name = System.nanoTime() + "." + extension;
-        Files.copy(file.getInputStream(), new File("images" + File.separator + name).toPath());
-        Image i=imageController.add(name,loggedUserId);
-        User u= getById(loggedUserId);
-        u.getImages().add(i);
-        repository.save(u);
-        return i.getImage_URL();
-    }
+
 }
 

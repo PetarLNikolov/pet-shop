@@ -28,7 +28,7 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping
+    @GetMapping()
     public ResponseEntity<String> notifyDiscountChange(Discount discount) {
         //TODO execute on each product and fix the responsebody
         return ResponseEntity.status(418).body("Your product is on sale  "+ discount.getPercentDiscount()+" % OFF");
@@ -49,10 +49,7 @@ public class UserController {
 
     @PostMapping("/users/reg")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user) {
-        String username = user.getUsername();
-        String password = user.getPassword();
-        String confirmPassword = user.getPassword2();
-        User u = userService.register(username, password, confirmPassword);
+        User u = userService.register(user);
         UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
         return ResponseEntity.ok(dto);
     }
@@ -79,12 +76,7 @@ public class UserController {
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
 
-    @SneakyThrows
-    @PostMapping("/users/image")
-    public String uploadProfileImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request){
-        LoginUtility.validateLogin(request);
-        return userService.uploadFile(file, request);
-    }
+
 
 
 }

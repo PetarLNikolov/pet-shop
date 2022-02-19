@@ -1,12 +1,12 @@
-package com.example.s13firstspring.models;
+package com.example.s13firstspring.models.entities;
 
-import com.example.s13firstspring.models.entities.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
 @Table(name = "products")
@@ -26,22 +26,22 @@ public class Product {
     @Column
     private int unitsInStock;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "brand_id")
+    @JoinColumn(name="brand_id")
     private Brand brand;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "subcategory_id")
+    @JoinColumn(name="subcategory_id")
     private Subcategory subcategory;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "animal_id")
+    @JoinColumn(name = "animal_id")
     private Animal animal;
     @Column
     private String description;
     @Column
     private double rating;
-    @Column
-    private String imageURL;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "discount_id")
+    @JoinColumn(name = "discount_id")
     private Discount discount;
+    @OneToMany(mappedBy = "product")
+    private Set<Image> images;
 
 }

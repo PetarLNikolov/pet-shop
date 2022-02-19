@@ -21,7 +21,7 @@ public class City {
     private int id;
 
     @Column
-    private String city_name;
+    private String name;
 
 
     @OneToMany(mappedBy = "city")

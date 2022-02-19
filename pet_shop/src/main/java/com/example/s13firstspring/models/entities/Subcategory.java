@@ -1,6 +1,5 @@
 package com.example.s13firstspring.models.entities;
 
-import com.example.s13firstspring.models.Product;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +23,7 @@ public class Subcategory {
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(referencedColumnName = "category_id")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @OneToMany(mappedBy="subcategory")
