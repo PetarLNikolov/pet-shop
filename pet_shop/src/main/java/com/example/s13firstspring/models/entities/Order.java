@@ -14,6 +14,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "orders")
@@ -39,5 +40,6 @@ public class Order {
     @JoinColumn(name = "delivery_id", nullable = false)
     private Delivery delivery;
 
-
+    @ManyToMany(mappedBy = "orderProducts")
+    Set<Product> favouriteProducts;
 }

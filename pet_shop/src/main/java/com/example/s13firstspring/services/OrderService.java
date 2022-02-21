@@ -1,5 +1,6 @@
 package com.example.s13firstspring.services;
 
+import com.example.s13firstspring.DAO.DAO;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.dtos.OrderAddDTO;
 import com.example.s13firstspring.models.entities.Order;
@@ -52,6 +53,8 @@ public class OrderService {
     ModelMapper mapper;
     private SessionFactory sessionFactory;
 
+    @Autowired
+    DAO dao;
 
     public OrderAddDTO add() {
 
@@ -92,27 +95,27 @@ public class OrderService {
         session.flush();
     }
 
-//    public ArrayList<Product> getProductsFromOrder(Order order){
-//        Connection connection = JdbcTemplate.getDataSource().getConnection();//needs to be provided data sourse
-//        ArrayList<Product> products = new ArrayList<>();
-//        try(PreparedStatement ps = connection.prepareStatement(PRODUCTS_FROM_ORDER_SQL)) {
-//            ps.setLong(1, order.getId());
-//            ResultSet rows = ps.executeQuery();
-//            while (rows.next()) {
-//                Product product = new Product();
-//                product.setId((long) rows.getInt("product_id"));;
-//                product.setName(rows.getString("p.name"));
-//                double price = rows.getDouble("price");
-//                DecimalFormat dF = new DecimalFormat("#.##");
-//                price = Double.parseDouble(dF.format(price));
-//                product.setPrice(price);
-//                product.setDescription(rows.getString("description"));
-//                product.setSubCategory(rows.getInt("subcategory_id"));
-//                products.add(product);
-//            }
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-//        return products;
-//    }
+    public ArrayList<Product> getProductsFromOrder(Order order) throws SQLException {
+        Connection connection = dao.getJdbcTemplate().getDataSource().getConnection();
+        ArrayList<Product> products = new ArrayList<>();
+        try(PreparedStatement ps = connection.prepareStatement(PRODUCTS_FROM_ORDER_SQL)) {
+            ps.setLong(1, order.getId());
+            ResultSet rows = ps.executeQuery();
+            while (rows.next()) {
+                Product product = new Product();
+                product.setId((int) rows.getInt("product_id"));;
+                product.setName(rows.getString("p.name"));
+                double price = rows.getDouble("price");
+                DecimalFormat dF = new DecimalFormat("#.##");
+                price = Double.parseDouble(dF.format(price));
+                product.setPrice(price);
+                product.setDescription(rows.getString("description"));
+                product.setSubCategory(rows.getInt("subcategory_id"));
+                products.add(product);
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+        return products;
+    }
 }
