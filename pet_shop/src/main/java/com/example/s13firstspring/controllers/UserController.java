@@ -1,5 +1,6 @@
 package com.example.s13firstspring.controllers;
 
+import com.example.s13firstspring.models.dtos.UserLoginDTO;
 import com.example.s13firstspring.models.dtos.UserRegisterDTO;
 import com.example.s13firstspring.models.dtos.UserResponseDTO;
 
@@ -7,13 +8,10 @@ import com.example.s13firstspring.models.entities.Discount;
 import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.services.UserService;
 import com.example.s13firstspring.services.utilities.LoginUtility;
-import lombok.SneakyThrows;
-import lombok.extern.java.Log;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -31,25 +29,23 @@ public class UserController {
     @GetMapping()
     public ResponseEntity<String> notifyDiscountChange(Discount discount) {
         //TODO execute on each product and fix the responsebody
-        return ResponseEntity.status(418).body("Your product is on sale  "+ discount.getPercentDiscount()+" % OFF");
+        return ResponseEntity.status(418).body("Your product is on sale  " + discount.getPercentDiscount() + " % OFF");
     }
 
 
     @PostMapping("/users/login")
-    public UserResponseDTO login(@RequestBody User user, HttpSession session, HttpServletRequest request) {
-        String username = user.getUsername();
-        String password = user.getPassword();
-        User u = userService.login(username, password);
+    public UserResponseDTO login(@RequestBody UserLoginDTO user, HttpSession session, HttpServletRequest request) {
+        User u = userService.login(user.getUsername(), user.getPassword());
         session.setAttribute(LoginUtility.LOGGED, true);
         session.setAttribute(LoginUtility.LOGGED_FROM, request.getRemoteAddr());
-        session.setAttribute(LoginUtility.IS_ADMIN, user.isAdmin());
+        session.setAttribute(LoginUtility.IS_ADMIN, u.isAdmin());
         UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
         return dto;
     }
 
     @PostMapping("/users/reg")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user) {
-        User u = userService.register(user);
+    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
+        User u = userService.register(user, request);
         UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
         return ResponseEntity.ok(dto);
     }
@@ -75,8 +71,6 @@ public class UserController {
         session.invalidate();
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
-
-
 
 
 }

@@ -1,10 +1,12 @@
 package com.example.s13firstspring.controllers;
 
 
+import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.entities.Product;
 import com.example.s13firstspring.models.dtos.ProductAddDTO;
 import com.example.s13firstspring.models.dtos.ProductEditUnitsDTO;
 import com.example.s13firstspring.models.dtos.ProductResponseDTO;
+import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.ProductService;
 import com.example.s13firstspring.services.utilities.LoginUtility;
 import lombok.SneakyThrows;
@@ -14,12 +16,15 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 public class ProductController {
 
     @Autowired
     private ProductService service;
+    @Autowired
+    private UserRepository userRepository;
 
 
     @PostMapping("/products/add")
@@ -29,7 +34,7 @@ public class ProductController {
         return ResponseEntity.ok(service.add(product));
     }
 
-    @GetMapping("products")
+    @GetMapping("/products")
     public ResponseEntity<ProductResponseDTO> get(@RequestParam(name = "name") String name, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
 
@@ -43,7 +48,7 @@ public class ProductController {
         return ResponseEntity.ok(service.changeInStock(id,product.getUnitsInStock()));
     }
 
-    @DeleteMapping("/delete/{id}")
+    @DeleteMapping("products/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
         LoginUtility.isAdmin(request);
@@ -57,10 +62,22 @@ public class ProductController {
     }
 
     @SneakyThrows
-    @PostMapping("/product/addImage/{productID}")
+    @PostMapping("/products/addImage/{productID}")
     public String addImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request,@PathVariable int productID){
         LoginUtility.validateLogin(request);
         return service.uploadFile(file, request,productID);
     }
 
+    @GetMapping("products/getAllByPrice")
+    public List<ProductResponseDTO> getAllByPrice(HttpServletRequest request){
+        LoginUtility.validateLogin(request);
+        return service.getAllByPrice();
+    }
+
+    @PostMapping("/products/addToFavourite/{id}")
+    public int addToFavourite(@PathVariable int id,HttpServletRequest request){
+        LoginUtility.validateLogin(request);
+        int userId= (int) request.getSession().getAttribute(LoginUtility.USER_ID);
+        return service.addToFavourites(id,userId);
+    }
 }

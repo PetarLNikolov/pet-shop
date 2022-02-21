@@ -26,10 +26,10 @@ public class Product {
     @Column
     private int unitsInStock;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="brand_id")
+    @JoinColumn(name = "brand_id")
     private Brand brand;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="subcategory_id")
+    @JoinColumn(name = "subcategory_id")
     private Subcategory subcategory;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "animal_id")
@@ -43,5 +43,12 @@ public class Product {
     private Discount discount;
     @OneToMany(mappedBy = "product")
     private Set<Image> images;
-
+    //
+    @ManyToMany
+    @JoinTable(
+            name = "users_have_favourites",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> fans;
 }

@@ -19,7 +19,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private int id;
     @Column
     private String firstName;
     @Column
@@ -39,6 +39,8 @@ public class User {
     private boolean isAdmin=false; //TODO    (true - false to MySQL 0-1)
     @OneToMany(mappedBy="user")
     private Set<Review> reviews;
+    @ManyToMany(mappedBy = "fans")
+    Set<Product> favouriteProducts;
 
 
 }

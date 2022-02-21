@@ -20,6 +20,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
 import java.io.File;
 import java.nio.file.Files;
@@ -55,10 +56,23 @@ public class UserService {
         return u;
     }
 
-    public User register(UserRegisterDTO user) {
+    public User register(UserRegisterDTO user,HttpServletRequest request) {
         String username= user.getUsername();
         String password=user.getPassword();
         String confirmPassword=user.getPassword2();
+        checkUser(username,password,confirmPassword);
+        User u = mapper.map(user,User.class);
+        u.setPassword(passwordEncoder.encode(password));
+        repository.save(u);
+        HttpSession s=request.getSession();
+        s.setAttribute(LoginUtility.USER_ID,u.getId());
+        s.setAttribute(LoginUtility.LOGGED, true);
+        s.setAttribute(LoginUtility.LOGGED_FROM, request.getRemoteAddr());
+        s.setAttribute(LoginUtility.IS_ADMIN, u.isAdmin());
+        return u;
+    }
+
+    private void checkUser(String username,String password,String confirmPassword) {
         if (username == null || username.isBlank()) {
             throw new BadRequestException("Username is mandatory");
         }
@@ -83,13 +97,9 @@ public class UserService {
         if (repository.findByUsername(username) != null) {
             throw new BadRequestException("User already exists");
         }
-        User u = mapper.map(user,User.class);
-        u.setPassword(passwordEncoder.encode(password));
-        repository.save(u);
-        return u;
     }
 
-    public User getById(long id) {
+    public User getById(int id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("User not found"));
     }
 

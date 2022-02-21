@@ -55,34 +55,34 @@ public class OrderController {
         orderService.delete(id);
     }
 
-    @GetMapping(value = "viewOrder/{id}")
-    public ArrayList<Product> view(@PathVariable("id") long orderId, HttpSession session, HttpServletResponse response) throws SQLException {
-        if (!SessionManager.isLogged(session)) {
-            throw new UnauthorizedException("You have to log in first");
-        }
-        User user = (User) session.getAttribute(SessionManager.USER_LOGGED);
-        if (!(orderRepository.existsById((int) orderId))){
-            throw new NotFoundException("Order not found!");
-        }
-        Order order = orderRepository.getById((int) orderId);
-
-            ArrayList <Product> pfc= orderService.getProductsFromOrder(order);
-            ArrayList<Product> products = new ArrayList<>();
-            double totalPrice = 0;
-            for (Product p: pfc) {
-                Optional<Product> product = Optional.ofNullable(productRepository.findByName(p.getName()));
-                if(product.isPresent()){
-                    totalPrice += p.getPrice();
-                    Product pr = product.get();
-                }
-                else{
-                    throw new NotFoundException("Product not found");
-                }
-            }
-            response.setHeader("total price", String.valueOf(totalPrice));
-            return products;
-
-    }
+//    @GetMapping(value = "viewOrder/{id}")
+//    public ArrayList<Product> view(@PathVariable("id") long orderId, HttpSession session, HttpServletResponse response) throws SQLException {
+//        if (!SessionManager.isLogged(session)) {
+//            throw new UnauthorizedException("You have to log in first");
+//        }
+//        User user = (User) session.getAttribute(SessionManager.USER_LOGGED);
+//        if (!(orderRepository.existsById((int) orderId))){
+//            throw new NotFoundException("Order not found!");
+//        }
+//        Order order = orderRepository.getById((int) orderId);
+//
+//            ArrayList <Product> pfc= orderService.getProductsFromOrder(order);
+//            ArrayList<Product> products = new ArrayList<>();
+//            double totalPrice = 0;
+//            for (Product p: pfc) {
+//                Optional<Product> product = Optional.ofNullable(productRepository.findByName(p.getName()));
+//                if(product.isPresent()){
+//                    totalPrice += p.getPrice();
+//                    Product pr = product.get();
+//                }
+//                else{
+//                    throw new NotFoundException("Product not found");
+//                }
+//            }
+//            response.setHeader("total price", String.valueOf(totalPrice));
+//            return products;
+//
+//    }
 
 
 }
