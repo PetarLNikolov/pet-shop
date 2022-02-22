@@ -54,4 +54,12 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> fans;
+
+    @ManyToMany
+    @JoinTable(
+            name = "orders_have_products",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "order_id")
+    )
+    private Set<Order> orderProducts ;
 }

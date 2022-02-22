@@ -2,11 +2,9 @@ package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.dtos.OrderAddDTO;
-import com.example.s13firstspring.models.dtos.ProductResponseDTO;
 import com.example.s13firstspring.models.entities.Order;
 import com.example.s13firstspring.models.entities.Product;
 import com.example.s13firstspring.models.repositories.OrderRepository;
-import com.example.s13firstspring.models.repositories.ProductRepository;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.modelmapper.ModelMapper;
@@ -49,8 +47,7 @@ public class OrderService {
 
     @Autowired
     OrderRepository orderRepository;
-    @Autowired
-    ProductRepository productRepository;
+
     @Autowired
     ModelMapper mapper;
     private SessionFactory sessionFactory;
@@ -93,15 +90,6 @@ public class OrderService {
         session.persist(o);
 
         session.flush();
-    }
-
-    public Product addProduct(int id) {
-        // proverki za produkt
-        Product product=productRepository.findById(id).orElseThrow(()->new NotFoundException("no such roduct"));
-        if(product.getUnitsInStock()==0) {
-
-        }
-        return product;
     }
 
 //    public ArrayList<Product> getProductsFromOrder(Order order){
