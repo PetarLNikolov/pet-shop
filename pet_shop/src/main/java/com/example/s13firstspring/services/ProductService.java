@@ -4,17 +4,16 @@ package com.example.s13firstspring.services;
 import com.example.s13firstspring.controllers.ImageController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.entities.Image;
-import com.example.s13firstspring.models.entities.Product;
-import com.example.s13firstspring.models.entities.User;
-import com.example.s13firstspring.models.repositories.ProductRepository;
+import com.example.s13firstspring.models.entities.*;
+import com.example.s13firstspring.models.repositories.*;
 import com.example.s13firstspring.models.dtos.ProductAddDTO;
 import com.example.s13firstspring.models.dtos.ProductResponseDTO;
-import com.example.s13firstspring.models.repositories.UserRepository;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,12 +30,22 @@ public class ProductService {
     private ProductRepository repository;
     @Autowired
     private ModelMapper mapper;
+
     @Autowired
     private ImageController imageController;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private AnimalRepository animalRepository;
+    @Autowired
+    private SubcategoryRepository subcategoryRepository;
+    @Autowired
+    private BrandRepository brandRepository;
+    @Autowired
+    private DiscountRepository discountRepository;
 
     public ProductResponseDTO add(ProductAddDTO product) {
+        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         if (repository.findByName(product.getName()) != null) {
             throw new BadRequestException("Product name is taken");
         }
@@ -47,34 +56,67 @@ public class ProductService {
             throw new BadRequestException("Product entity count lower than 0");
         }
         Product p = mapper.map(product, Product.class);
+        Animal a = animalRepository.findById(product.getAnimalId()).orElseThrow(() -> new NotFoundException("Animal not found"));
+        Subcategory s = subcategoryRepository.findById(product.getSubcategoryId()).orElseThrow(() -> new NotFoundException("Subcategory not found"));
+        Brand b = brandRepository.findById(product.getBrandId()).orElseThrow(() -> new NotFoundException("Brand not found"));
+        Discount d = discountRepository.findById(product.getDiscountId()).orElseThrow(() -> new NotFoundException("Discount not found"));
+        p.setAnimal(a);
+        p.setSubcategory(s);
+        p.setBrand(b);
+        p.setDiscount(d);
+        if (p.getDiscount() != null) {
+            p.setDiscountPrice(p.getPrice() * (100 - p.getDiscount().getPercentDiscount()) / 100);
+        }
         repository.save(p);
         return mapper.map(p, ProductResponseDTO.class);
     }
 
-    public ProductResponseDTO get(String name) {
-        Product product = repository.findByName(name); //TODO findByName- optional so you can call orElse throw exception
+    public ProductResponseDTO getByName(String name) {
+        if (name == null || name.length() > 1000) {
+            throw new BadRequestException("Name is mandatory and has less than 1000 characters");
+        }
+
+        Product product = repository.findByNameContaining(name.replaceAll("\\s+", ""));
         if (product == null) {
             throw new NotFoundException("Product not found");
         }
         return mapper.map(product, ProductResponseDTO.class);
     }
 
-    public void delete(int id) {
-        repository.delete(getById(id));
+    public String delete(int id) {
+        Product p = getById(id);
+        String name = p.getName();
+        repository.delete(p);
+        return name;
     }
 
-    public ProductResponseDTO changeInStock(int id, int countOfStock) {
-        if (countOfStock < 0) {
-            throw new BadRequestException("Stock cant be less than 0");
+    public Integer addToStock(int id, int units) {
+        Product p = repository.getById(id);
+        int updatedUnits = p.getUnitsInStock() + units;
+        if (updatedUnits > 1000) {
+            throw new BadRequestException("Exceeded stock space for product: " + p.getName() + " (over 1000 units)");
         }
-        Product p = getById(id);
-        p.setUnitsInStock(countOfStock);
+        p.setUnitsInStock(updatedUnits);
         repository.save(p);
-        return mapper.map(p, ProductResponseDTO.class);
+        return p.getUnitsInStock();
     }
+
+    public Integer removeFromStock(int id, int units) {
+        Product p = repository.getById(id);
+        int updatedUnits = p.getUnitsInStock() - units;
+        if (updatedUnits < 0) {
+            throw new BadRequestException("Not enough units of product: " + p.getName() + "" +
+                    "Units in stock: " + p.getUnitsInStock());
+        }
+        p.setUnitsInStock(updatedUnits);
+        repository.save(p);
+        return p.getUnitsInStock();
+    }
+
 
     public ProductResponseDTO edit(Product p) {
         Product p1 = repository.getById(p.getId());
+        p1.setDiscountPrice(p.getPrice() * (100 - p.getDiscount().getPercentDiscount()) / 100);
         repository.save(p1);
         return mapper.map(p1, ProductResponseDTO.class);
     }
@@ -112,8 +154,19 @@ public class ProductService {
         return p.getFans().size();
     }
 
-    //Utility method
+    public ProductResponseDTO findProductById(int id) {
+        System.out.println("id is" + id);
+        return mapper.map(getById(id), ProductResponseDTO.class);
+    }
+
+    //UTILITY
     private Product getById(int id) {
         return repository.findById(id).orElseThrow(() -> new BadRequestException("Product not found"));
+    }
+
+    public ProductResponseDTO setDiscount(int productId, int discountId) {
+        Product p = repository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
+        p.setDiscount(discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found")));
+        return mapper.map(repository.save(p),ProductResponseDTO.class);
     }
 }

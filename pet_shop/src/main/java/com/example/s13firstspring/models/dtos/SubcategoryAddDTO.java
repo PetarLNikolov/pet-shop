@@ -7,4 +7,6 @@ public class SubcategoryAddDTO {
 
     private String name;
 
+    private int category_id;
+
 }

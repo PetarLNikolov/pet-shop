@@ -24,9 +24,9 @@ public class DeliveryService {
     private DeliveryRepository deliveryRepository;
 
     public DeliveryWithoutCityDTO add(DeliveryWithoutCityDTO delivery) {
-
-        Delivery d =new Delivery();
-        d.setExtraInformation(delivery.getExtraInfromation());
+        //TODO Проверки
+        Delivery d =mapper.map(delivery,Delivery.class);
+        deliveryRepository.save(d);
         return mapper.map(d, DeliveryWithoutCityDTO.class);
     }
 

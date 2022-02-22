@@ -9,16 +9,17 @@ Content-Type: application/json
 }
 
 ### user register (imash nqkakwa drama s 405 code opravi- metod not allowed )
-POST localhost:6666/users/req
+POST localhost:6666/users/reqister
 Content-Type: application/json
 
 {
-  "first_name": "Ivan",
-  "last_name": "Georgiev",
-  "username": "ivanchoGeorgiev777",
-  "email": "ivanchoGeorgiev777@gmail.com",
+  "firstName": "Atanas",
+  "lastName": "Yanchevski",
+  "username": "atanas77yan",
+  "email": "atanasYanchevski89@gmail.com",
+  "phone_number": "08878785463",
   "password": "pasolrla",
-  "phone_number": "0889894"
+  "password2": "pasolrla"
 }
 
 ### add favourite product to user

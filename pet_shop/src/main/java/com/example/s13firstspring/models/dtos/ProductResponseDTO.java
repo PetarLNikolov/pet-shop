@@ -1,6 +1,9 @@
 package com.example.s13firstspring.models.dtos;
 
+import com.example.s13firstspring.models.entities.Image;
 import lombok.Data;
+
+import java.util.Set;
 
 @Data
 public class ProductResponseDTO {
@@ -10,6 +13,8 @@ public class ProductResponseDTO {
     private String name;
 
     private double price;
+
+    private double discountPrice;
 
     private int unitsInStock;
 
@@ -23,7 +28,6 @@ public class ProductResponseDTO {
 
     private AnimalWithoutProductsDTO animal;
 
-    private String imageURLp;
 
     private DiscountWithoutProducts discount;
 

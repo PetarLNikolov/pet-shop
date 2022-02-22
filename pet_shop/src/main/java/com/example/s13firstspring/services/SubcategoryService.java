@@ -4,6 +4,7 @@ import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.dtos.*;
 import com.example.s13firstspring.models.entities.Subcategory;
+import com.example.s13firstspring.models.repositories.CategoryRepository;
 import com.example.s13firstspring.models.repositories.SubcategoryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class SubcategoryService {
     private SubcategoryRepository repository;
     @Autowired
     ModelMapper mapper;
+    @Autowired
+    CategoryRepository categoryRepository;
 
     public SubcategoryResponseDTO add(SubcategoryAddDTO subcategory) {
         if (repository.findByName(subcategory.getName()) != null) {
@@ -26,6 +29,7 @@ public class SubcategoryService {
         }
         Subcategory s = new Subcategory();
         s.setName(subcategory.getName());
+        s.setCategory(categoryRepository.getById(subcategory.getCategory_id()));
         repository.save(s);
         return mapper.map(s, SubcategoryResponseDTO.class);
     }

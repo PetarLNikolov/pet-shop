@@ -11,6 +11,7 @@ import com.example.s13firstspring.services.ProductService;
 import com.example.s13firstspring.services.utilities.LoginUtility;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,25 +35,36 @@ public class ProductController {
         return ResponseEntity.ok(service.add(product));
     }
 
-    @GetMapping("/products")
-    public ResponseEntity<ProductResponseDTO> get(@RequestParam(name = "name") String name, HttpServletRequest request) {
+    @GetMapping("/products/{name}")
+    public ResponseEntity<ProductResponseDTO> searchByName(@PathVariable String name, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
-
-        return ResponseEntity.ok(service.get(name));
+        return ResponseEntity.ok(service.getByName(name));
     }
 
-    @PutMapping("/products/editUnits/{id}")
-    public ResponseEntity<ProductResponseDTO> editUnits(@PathVariable int id, @RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
+    @GetMapping("/products/getById/{id}")
+    public ResponseEntity<ProductResponseDTO> getById(@PathVariable int id, HttpServletRequest request){
         LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
-        return ResponseEntity.ok(service.changeInStock(id,product.getUnitsInStock()));
+        return ResponseEntity.ok(service.findProductById(id));
     }
 
-    @DeleteMapping("products/delete/{id}")
-    public void delete(@PathVariable int id, HttpServletRequest request) {
+    @PutMapping("/products/addUnits")
+    public ResponseEntity<String> addUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
         LoginUtility.isAdmin(request);
-        service.delete(id);
+        return ResponseEntity.ok("Units in stock: "+service.addToStock(product.getId(),product.getNumberOfProducts()));
+    }
+    @PutMapping("/products/removeUnits")
+    public ResponseEntity<String> removeUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
+        LoginUtility.validateLogin(request);
+        LoginUtility.isAdmin(request);
+        return ResponseEntity.ok("Units in stock:"+ service.removeFromStock(product.getId(),product.getNumberOfProducts()));
+    }
+
+    @DeleteMapping("/products/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable int id, HttpServletRequest request) {
+        LoginUtility.validateLogin(request);
+        LoginUtility.isAdmin(request);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Deleted product: "+service.delete(id));
     }
     @PutMapping("/products/edit/{id}")
     public ResponseEntity<ProductResponseDTO> edit(@PathVariable int id, @RequestBody Product product, HttpServletRequest request) {
@@ -68,7 +80,7 @@ public class ProductController {
         return service.uploadFile(file, request,productID);
     }
 
-    @GetMapping("products/getAllByPrice")
+    @GetMapping("/products/getAllByPrice")
     public List<ProductResponseDTO> getAllByPrice(HttpServletRequest request){
         LoginUtility.validateLogin(request);
         return service.getAllByPrice();
@@ -79,5 +91,12 @@ public class ProductController {
         LoginUtility.validateLogin(request);
         int userId= (int) request.getSession().getAttribute(LoginUtility.USER_ID);
         return service.addToFavourites(id,userId);
+    }
+
+    @PutMapping("/products/setDiscount/{productId}/discount/{discountId}")
+    public ResponseEntity<ProductResponseDTO> setDiscount(@PathVariable int productId,@PathVariable int discountId,HttpServletRequest request){
+        LoginUtility.validateLogin(request);
+        LoginUtility.isAdmin(request);
+        return ResponseEntity.ok().body(service.setDiscount(productId,discountId));
     }
 }

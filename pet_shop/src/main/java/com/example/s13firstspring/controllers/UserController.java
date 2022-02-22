@@ -26,44 +26,40 @@ public class UserController {
     @Autowired
     private ModelMapper modelMapper;
 
-    @GetMapping()
-    public ResponseEntity<String> notifyDiscountChange(Discount discount) {
-        //TODO execute on each product and fix the responsebody
-        return ResponseEntity.status(418).body("Your product is on sale  " + discount.getPercentDiscount() + " % OFF");
-    }
+//    public static ResponseEntity<String> notifyDiscountChange(Discount discount) {
+//        return ResponseEntity.status(418).body("Your product is on sale  " + discount.getPercentDiscount() + " % OFF");
+//    }
 
 
     @PostMapping("/users/login")
-    public UserResponseDTO login(@RequestBody UserLoginDTO user, HttpSession session, HttpServletRequest request) {
+    public UserResponseDTO login(@RequestBody UserLoginDTO user, HttpServletRequest request) {
         User u = userService.login(user.getUsername(), user.getPassword());
+        HttpSession session=request.getSession();
         session.setAttribute(LoginUtility.LOGGED, true);
         session.setAttribute(LoginUtility.LOGGED_FROM, request.getRemoteAddr());
         session.setAttribute(LoginUtility.IS_ADMIN, u.isAdmin());
-        UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
-        return dto;
+        return modelMapper.map(u, UserResponseDTO.class);
     }
 
-    @PostMapping("/users/reg")
+    @PostMapping("/users/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
         User u = userService.register(user, request);
-        UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
-        return ResponseEntity.ok(dto);
+        HttpSession session=request.getSession();
+        session.setAttribute(LoginUtility.LOGGED, true);
+        session.setAttribute(LoginUtility.LOGGED_FROM, request.getRemoteAddr());
+        session.setAttribute(LoginUtility.IS_ADMIN, u.isAdmin());
+        return ResponseEntity.ok(modelMapper.map(u, UserResponseDTO.class));
     }
 
     @GetMapping("/users/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable int id) {
-        User u = userService.getById(id);
-        UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(userService.getById(id));
     }
 
     @PutMapping("/users")
-    public ResponseEntity<UserResponseDTO> edit(@RequestBody User user, HttpServletRequest request) {
+    public ResponseEntity<UserResponseDTO> edit(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
         LoginUtility.validateLogin(request);
-        User u = userService.edit(user);
-        UserResponseDTO dto = modelMapper.map(u, UserResponseDTO.class);
-        return ResponseEntity.ok(dto);
-
+        return ResponseEntity.ok(userService.edit(user));
     }
 
     @PostMapping("/users/logout")

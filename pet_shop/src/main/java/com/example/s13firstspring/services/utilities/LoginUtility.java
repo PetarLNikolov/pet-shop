@@ -15,7 +15,6 @@ public class LoginUtility {
     public static final String USER_ID = "user_id";
 
     public static void validateLogin(HttpServletRequest request) {
-
         HttpSession s = request.getSession();
         if (s.isNew() ||
                 (!(Boolean) s.getAttribute(LOGGED)) ||

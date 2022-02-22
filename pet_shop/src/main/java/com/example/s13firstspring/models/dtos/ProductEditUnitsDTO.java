@@ -5,6 +5,5 @@ import lombok.Data;
 @Data
 public class ProductEditUnitsDTO {
     private int id;
-    private int unitsInStock;
-
+    private int numberOfProducts;
 }

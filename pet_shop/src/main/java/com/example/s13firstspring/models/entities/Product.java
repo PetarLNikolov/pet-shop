@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
@@ -24,6 +25,8 @@ public class Product {
     @Column
     private double price;
     @Column
+    private double discountPrice;
+    @Column
     private int unitsInStock;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id")
@@ -37,7 +40,7 @@ public class Product {
     @Column
     private String description;
     @Column
-    private double rating;
+    private BigDecimal rating;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_id")
     private Discount discount;
