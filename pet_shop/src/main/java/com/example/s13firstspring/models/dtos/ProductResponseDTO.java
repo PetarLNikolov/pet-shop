@@ -28,7 +28,8 @@ public class ProductResponseDTO {
 
     private AnimalWithoutProductsDTO animal;
 
-
     private DiscountWithoutProducts discount;
+
+    private String imageUrl;
 
 }

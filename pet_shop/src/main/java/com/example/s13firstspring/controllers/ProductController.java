@@ -73,8 +73,8 @@ public class ProductController {
     }
 
     @SneakyThrows
-    @PostMapping("/products/addImage/{productID}")
-    public String addImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request,@PathVariable int productID){
+    @PostMapping("/products/uploadImage/{productID}")
+    public String uploadImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request,@PathVariable int productID){
         SessionUtility.validateLogin(request);
         return service.uploadImage(file, request,productID);
     }

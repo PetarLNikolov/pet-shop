@@ -15,7 +15,7 @@ public class ImageService {
 
     public Image add(String name, Product p) {
         Image i= new Image();
-        i.setImageURL(name);
+        i.setImage_URL(name);
         i.setProduct(p);
         return repository.save(i);
 

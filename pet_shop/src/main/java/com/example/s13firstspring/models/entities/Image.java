@@ -19,7 +19,7 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
-    private String imageURL;
+    private String image_URL;
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
@@ -29,8 +29,6 @@ public class Image {
     public String toString() {
         return "Image{" +
                 "id=" + id +
-                ", image_URL='" + imageURL + '\'' +
-                ", products" + product +
-                '}';
+                ", image_URL='" + image_URL ;
     }
 }

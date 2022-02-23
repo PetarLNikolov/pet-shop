@@ -123,6 +123,8 @@ public class ProductService {
 
     @SneakyThrows
     public String uploadImage(MultipartFile file, HttpServletRequest request, int productID) {
+        //By default, Java supports only these five formats for images: JPEG, PNG, BMP, WEBMP, GIF and exception handler
+        // gets the msg from the null pointer exception if the file is not supported by java
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String name = System.nanoTime() + "." + extension;
@@ -130,8 +132,8 @@ public class ProductService {
         Product p = getById(productID);
         Image i = imageController.add(name, p);
         p.getImages().add(i);
-        repository.save(p);
-        return i.getImageURL();
+        //repository.save(p);
+        return i.getImage_URL();
     }
 
     public List<ProductResponseDTO> getAllByPrice() {
@@ -169,4 +171,5 @@ public class ProductService {
         p.setDiscount(discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found")));
         return mapper.map(repository.save(p),ProductResponseDTO.class);
     }
+
 }
