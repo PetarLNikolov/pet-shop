@@ -8,6 +8,6 @@ import java.util.Set;
 
 @Data
 public class CityWithoutDeliveriesDTO implements Serializable {
-    private long id;
+    private int id;
     private String city_name;
 }

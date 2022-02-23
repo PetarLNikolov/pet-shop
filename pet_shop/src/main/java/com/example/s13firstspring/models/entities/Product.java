@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -55,11 +56,10 @@ public class Product {
     )
     private Set<User> fans;
 
-    @ManyToMany
-    @JoinTable(
-            name = "orders_have_products",
-            joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "order_id")
-    )
-    private Set<Order> orderProducts ;
+    @OneToMany(mappedBy = "product")
+    Set<OrdersHaveProducts> haveProducts=new HashSet<>();
+
+
+//    @ManyToMany(mappedBy = "products")
+//    Set<Order> orders;
 }

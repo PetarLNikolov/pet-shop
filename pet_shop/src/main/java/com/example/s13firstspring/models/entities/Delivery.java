@@ -21,32 +21,32 @@ public class Delivery {
     private int id;
 
     @Column(name = "first_name", nullable = false, length = 128)
-    private String firstName1;
+    private String firstName;
 
     @Column(name = "last_name", nullable = false, length = 128)
-    private String lastName1;
+    private String lastName;
 
-    @Column(name = "phone_number", nullable = false)
-    private String phoneNumber1;
+    @Column(name = "phone_number")
+    private String phoneNumber;
 
-    @Column(name = "region", nullable = false, length = 64)
+    @Column(name = "region", length = 64)
     private String region;
 
-    @Column(name = "post_code", nullable = false)
-    private Integer postCode1;
+    @Column(name = "post_code")
+    private int postCode;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "city_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "city_id")
     private City city;
 
     @Column(name = "house_number")
-    private Integer houseNumber;
+    private int houseNumber;
 
     @Column(name = "floor")
-    private Integer floor;
+    private int floor;
 
     @Column(name = "appartament_number")
-    private Integer appartamentNumber;
+    private int appartamentNumber;
 
     @Column(name = "needs_bill")
     private Boolean needsBill;

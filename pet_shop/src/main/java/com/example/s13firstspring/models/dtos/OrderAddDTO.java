@@ -4,6 +4,5 @@ import lombok.Data;
 
 @Data
 public class OrderAddDTO {
-    private Integer id;
-
+    private int userId;
 }

@@ -32,7 +32,7 @@ public class DeliveryService {
 
     @Transactional
     public Delivery edit(Delivery delivery) {
-        Optional<Delivery> opt = deliveryRepository.findById((long) delivery.getId());
+        Optional<Delivery> opt = deliveryRepository.findById( delivery.getId());
         if (opt.isPresent()) {
             deliveryRepository.save(delivery);
             return delivery;
@@ -42,14 +42,14 @@ public class DeliveryService {
     }
 
     public void delete(int id) {
-        if (deliveryRepository.getById((long) id) == null) {
+        if (deliveryRepository.getById( id) == null) {
             throw new NotFoundException("Delivery not found");
         }
-        deliveryRepository.deleteById((long) id);
+        deliveryRepository.deleteById( id);
     }
 
     public DeliveryWithoutCityDTO getById(int id) {
-        Optional<Delivery> opt = deliveryRepository.findById((long) id);
+        Optional<Delivery> opt = deliveryRepository.findById(id);
         if (opt.isPresent()) {
             Delivery d = opt.get();
             DeliveryWithoutCityDTO dto = mapper.map(d, DeliveryWithoutCityDTO.class);

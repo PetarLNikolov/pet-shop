@@ -1,14 +1,13 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.entities.Product;
 import com.example.s13firstspring.models.dtos.ProductAddDTO;
 import com.example.s13firstspring.models.dtos.ProductEditUnitsDTO;
 import com.example.s13firstspring.models.dtos.ProductResponseDTO;
 import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.ProductService;
-import com.example.s13firstspring.services.utilities.LoginUtility;
+import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,73 +29,73 @@ public class ProductController {
 
     @PostMapping("/products/add")
     public ResponseEntity<ProductResponseDTO> addProduct(@RequestBody ProductAddDTO product, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         return ResponseEntity.ok(service.add(product));
     }
 
     @GetMapping("/products/{name}")
     public ResponseEntity<ProductResponseDTO> searchByName(@PathVariable String name, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
+        SessionUtility.validateLogin(request);
         return ResponseEntity.ok(service.getByName(name));
     }
 
     @GetMapping("/products/getById/{id}")
     public ResponseEntity<ProductResponseDTO> getById(@PathVariable int id, HttpServletRequest request){
-        LoginUtility.validateLogin(request);
+        SessionUtility.validateLogin(request);
         return ResponseEntity.ok(service.findProductById(id));
     }
 
     @PutMapping("/products/addUnits")
     public ResponseEntity<String> addUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         return ResponseEntity.ok("Units in stock: "+service.addToStock(product.getId(),product.getNumberOfProducts()));
     }
     @PutMapping("/products/removeUnits")
     public ResponseEntity<String> removeUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         return ResponseEntity.ok("Units in stock:"+ service.removeFromStock(product.getId(),product.getNumberOfProducts()));
     }
 
     @DeleteMapping("/products/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable int id, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Deleted product: "+service.delete(id));
     }
     @PutMapping("/products/edit/{id}")
     public ResponseEntity<ProductResponseDTO> edit(@PathVariable int id, @RequestBody Product product, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         return ResponseEntity.ok(service.edit(product));
     }
 
     @SneakyThrows
     @PostMapping("/products/addImage/{productID}")
     public String addImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request,@PathVariable int productID){
-        LoginUtility.validateLogin(request);
-        return service.uploadFile(file, request,productID);
+        SessionUtility.validateLogin(request);
+        return service.uploadImage(file, request,productID);
     }
 
     @GetMapping("/products/getAllByPrice")
     public List<ProductResponseDTO> getAllByPrice(HttpServletRequest request){
-        LoginUtility.validateLogin(request);
+        SessionUtility.validateLogin(request);
         return service.getAllByPrice();
     }
 
     @PostMapping("/products/addToFavourite/{id}")
     public int addToFavourite(@PathVariable int id,HttpServletRequest request){
-        LoginUtility.validateLogin(request);
-        int userId= (int) request.getSession().getAttribute(LoginUtility.USER_ID);
+        SessionUtility.validateLogin(request);
+        int userId= (int) request.getSession().getAttribute(SessionUtility.USER_ID);
         return service.addToFavourites(id,userId);
     }
 
     @PutMapping("/products/setDiscount/{productId}/discount/{discountId}")
     public ResponseEntity<ProductResponseDTO> setDiscount(@PathVariable int productId,@PathVariable int discountId,HttpServletRequest request){
-        LoginUtility.validateLogin(request);
-        LoginUtility.isAdmin(request);
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         return ResponseEntity.ok().body(service.setDiscount(productId,discountId));
     }
 }

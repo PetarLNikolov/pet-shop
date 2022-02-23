@@ -1,118 +1,120 @@
 package com.example.s13firstspring.services;
 
+import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.OrderAddDTO;
-import com.example.s13firstspring.models.entities.Order;
-import com.example.s13firstspring.models.entities.Product;
-import com.example.s13firstspring.models.repositories.OrderRepository;
-import org.hibernate.Session;
+import com.example.s13firstspring.models.dtos.*;
+import com.example.s13firstspring.models.entities.*;
+import com.example.s13firstspring.models.repositories.*;
+import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.hibernate.SessionFactory;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.JdbcAccessor;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
 
-import javax.sql.DataSource;
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.sql.*;
-import java.sql.Connection;
-import java.text.DecimalFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-
 
 @Service
 public class OrderService {
 
-    private static final String PRODUCTS_FROM_ORDER_SQL = "SELECT o.date as date, o.id as order_id, p.id as product_id, p.name, \n" +
-            "IF((p.discount_id is not null AND d.date_from<o.created_on \n" +
-            "AND d.date_to>o.created_on), p.price*(1-d.amount/100) ,p.price)\n" +
-            "AS price, p.description, s.name as subcategory, c.name, s.id, c.id\n" +
-            "FROM orders AS o\n" +
-            "JOIN order_has_product AS op \n" +
-            "ON order_id = o.id \n" +
-            "JOIN products AS p \n" +
-            "ON product_id = p.id\n" +
-            "JOIN subcategories as s\n" +
-            "ON s.id = p.subcategory_id\n" +
-            "JOIN categories as c\n" +
-            "ON c.id = s.category_id\n" +
-            "LEFT OUTER JOIN discounts AS d\n" +
-            "ON d.id = p.discount_id\n" +
-            "WHERE order_id = ?\n" +
-            "GROUP BY product_id";
-
     @Autowired
     OrderRepository orderRepository;
+    @Autowired
+    ProductRepository productRepository;
+    @Autowired
+    UserRepository userRepository;
+    @Autowired
+    DeliveryRepository deliveryRepository;
+    @Autowired
+    OrdersHaveProductsRepository ordersHaveProductsRepository;
+    @Autowired
+    JdbcTemplate jdbcTemplate;
 
     @Autowired
     ModelMapper mapper;
     private SessionFactory sessionFactory;
 
 
-    public OrderAddDTO add() {
-
-        Order o=new Order();
+    public OrderResponseDTO add(OrderAddDTO order, HttpServletRequest request) {
+        User u = userRepository.findById(order.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
+        Order o = new Order();
         o.setCreatedAt(LocalDateTime.now());
-        orderRepository.save(o);
-        return mapper.map(o, OrderAddDTO.class);
+        o.setUser(u);
+        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, 0.00);
+        return mapper.map(orderRepository.save(o), OrderResponseDTO.class);
     }
 
-    @Transactional
-    public Order edit(Order order) {
-        Optional<Order> opt = orderRepository.findById((order.getId()));
-        if (opt.isPresent()) {
-            orderRepository.save(order);
-            return order;
-        } else {
-            throw new NotFoundException("Order not found");
-        }
-    }
 
     public void delete(int id) {
-        if (orderRepository.getById(id) == null) {
-            throw new NotFoundException("Order not found");
-        }
-        orderRepository.deleteById(id);
+        orderRepository.delete(orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found")));
     }
+
     @Transactional
-    public void saveOrder(Order order) {
-        Session session = sessionFactory.getCurrentSession();
-
-        Order o = new Order();
-
-        o.setCreatedAt(LocalDateTime.now());
-        orderRepository.save(o);;
-
-        session.persist(o);
-
-        session.flush();
+    public DeliveryResponseDTO finalizeOrder(int orderId, int deliveryId) {
+        Order o = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
+        Delivery d = new Delivery();
+        if (deliveryRepository.findById(deliveryId).isPresent()) {
+            d = deliveryRepository.getById(deliveryId);
+        }
+        User u=o.getUser();
+        d.getOrders().add(o);
+        d.setFirstName(u.getFirstName());
+        d.setLastName(u.getLastName());
+        d.setPhoneNumber(u.getPhoneNumber());
+        deliveryRepository.save(d);
+        //o.setDelivery(d);
+        return mapper.map(d, DeliveryResponseDTO.class);
     }
 
-//    public ArrayList<Product> getProductsFromOrder(Order order){
-//        Connection connection = JdbcTemplate.getDataSource().getConnection();//needs to be provided data sourse
-//        ArrayList<Product> products = new ArrayList<>();
-//        try(PreparedStatement ps = connection.prepareStatement(PRODUCTS_FROM_ORDER_SQL)) {
-//            ps.setLong(1, order.getId());
-//            ResultSet rows = ps.executeQuery();
-//            while (rows.next()) {
-//                Product product = new Product();
-//                product.setId((long) rows.getInt("product_id"));;
-//                product.setName(rows.getString("p.name"));
-//                double price = rows.getDouble("price");
-//                DecimalFormat dF = new DecimalFormat("#.##");
-//                price = Double.parseDouble(dF.format(price));
-//                product.setPrice(price);
-//                product.setDescription(rows.getString("description"));
-//                product.setSubCategory(rows.getInt("subcategory_id"));
-//                products.add(product);
-//            }
-//        } catch (SQLException throwables) {
-//            throwables.printStackTrace();
-//        }
-//        return products;
-//    }
+    public OrderWithProductAndUnitsDTO addProduct(int productId, int orderId, HttpServletRequest request) {
+        Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
+        if (product.getUnitsInStock() == 0) {
+            throw new BadRequestException("Out of stock for product: " + product.getName());
+        }
+        Order o = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
+
+
+        OrdersHaveProductsKey ohpk = new OrdersHaveProductsKey(productId, orderId);
+        int units = 1;
+
+        Optional<OrdersHaveProducts> o2 = ordersHaveProductsRepository.findById(ohpk);
+        if (o2.isPresent()) {
+            units += ordersHaveProductsRepository.getById(ohpk).getUnits();
+        } else {
+            OrdersHaveProducts ordersHaveProducts = new OrdersHaveProducts(ohpk, product, o, 0);
+            ordersHaveProductsRepository.save(ordersHaveProducts);
+        }
+        OrdersHaveProducts ohp = new OrdersHaveProducts(ohpk, product, o, units);
+        ordersHaveProductsRepository.save(ohp);
+        OrderWithProductAndUnitsDTO orderResponse = new OrderWithProductAndUnitsDTO();
+        orderResponse.setProductsInOrder(getOrder(orderId));
+
+        Double price = product.getDiscountPrice();
+        if (request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) != null) {
+            price += (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE);
+        }
+        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, price);
+        orderResponse.setCost(price);
+        orderResponse.setOrderId(orderId);
+        return orderResponse;
+    }
+
+
+    private Map<String, Integer> getOrder(int orderId) {
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT p.id AS productId,p.name AS product_name,ohp.units AS units FROM products AS p INNER JOIN orders_have_products AS ohp ON p.id=ohp.product_id WHERE ohp.order_id=(?)", orderId);
+        Map<String, Integer> order = new HashMap<>();
+        while (rowSet.next()) {
+            order.put(rowSet.getString("product_name"), rowSet.getInt("units"));
+        }
+        return order;
+    }
+
+
 }

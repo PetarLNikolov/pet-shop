@@ -7,13 +7,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Data
-public class LoginUtility {
+public class SessionUtility {
 
     public static final String IS_ADMIN = "is_admin";
     public static final String LOGGED = "logged";
     public static final String LOGGED_FROM = "logged_from";
     public static final String USER_ID = "user_id";
-
+    public static final String ORDER_FINAL_PRICE="order_final_price";
     public static void validateLogin(HttpServletRequest request) {
         HttpSession s = request.getSession();
         if (s.isNew() ||

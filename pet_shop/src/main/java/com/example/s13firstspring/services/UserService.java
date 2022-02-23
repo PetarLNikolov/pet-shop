@@ -1,39 +1,28 @@
 package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.controllers.ImageController;
-import com.example.s13firstspring.controllers.UserController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
 import com.example.s13firstspring.models.dtos.UserRegisterDTO;
 import com.example.s13firstspring.models.dtos.UserResponseDTO;
-import com.example.s13firstspring.models.entities.Image;
 import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.models.repositories.UserRepository;
-import com.example.s13firstspring.services.utilities.LoginUtility;
-import lombok.SneakyThrows;
-import org.apache.commons.io.FilenameUtils;
+import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.io.File;
-import java.nio.file.Files;
-import java.util.Optional;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
 public class UserService {
 
-    public static final Pattern VALID_EMAIL_ADDRESS_REGEX =
-            Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+
 
     @Autowired
     private UserRepository repository;
@@ -74,10 +63,10 @@ public class UserService {
         u.setPassword(passwordEncoder.encode(u.getPassword()));
         repository.save(u);
         HttpSession s = request.getSession();
-        s.setAttribute(LoginUtility.USER_ID, u.getId());
-        s.setAttribute(LoginUtility.LOGGED, true);
-        s.setAttribute(LoginUtility.LOGGED_FROM, request.getRemoteAddr());
-        s.setAttribute(LoginUtility.IS_ADMIN, u.isAdmin());
+        s.setAttribute(SessionUtility.USER_ID, u.getId());
+        s.setAttribute(SessionUtility.LOGGED, true);
+        s.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
+        s.setAttribute(SessionUtility.IS_ADMIN, u.isAdmin());
         return u;
     }
 

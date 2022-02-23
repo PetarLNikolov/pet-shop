@@ -122,7 +122,7 @@ public class ProductService {
     }
 
     @SneakyThrows
-    public String uploadFile(MultipartFile file, HttpServletRequest request, int productID) {
+    public String uploadImage(MultipartFile file, HttpServletRequest request, int productID) {
 
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String name = System.nanoTime() + "." + extension;

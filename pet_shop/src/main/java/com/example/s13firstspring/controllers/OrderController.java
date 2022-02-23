@@ -1,20 +1,21 @@
 package com.example.s13firstspring.controllers;
 
 
-
 import com.example.s13firstspring.models.dtos.*;
 import com.example.s13firstspring.models.entities.*;
 import com.example.s13firstspring.models.repositories.DeliveryRepository;
 import com.example.s13firstspring.models.repositories.OrderRepository;
 import com.example.s13firstspring.models.repositories.ProductRepository;
 import com.example.s13firstspring.services.OrderService;
-import com.example.s13firstspring.services.utilities.LoginUtility;
+import com.example.s13firstspring.services.utilities.SessionUtility;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 @RestController
 public class OrderController {
@@ -30,31 +31,33 @@ public class OrderController {
 
     @Autowired
     private DeliveryRepository deliveryRepository;
+    @Autowired
+    private ModelMapper mapper;
 
 
     @PostMapping("/orders/add")
-    public ResponseEntity<OrderAddDTO> add(@RequestBody HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        return ResponseEntity.ok(orderService.add());
+    public ResponseEntity<OrderResponseDTO> add(@RequestBody OrderAddDTO order, HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
+        return ResponseEntity.ok(orderService.add(order, request));
     }
 
-    //-edit order
-    @PutMapping("/orders/edit")
-    public ResponseEntity<Order> edit(@RequestBody Order order, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
-        return ResponseEntity.ok(orderService.edit(order));
+    @PutMapping("/orders/addProduct/{productId}/order/{orderId}")
+    public ResponseEntity<OrderWithProductAndUnitsDTO> addProduct(@PathVariable("productId") int product_id, @PathVariable("orderId") int order_id,  HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
+        return ResponseEntity.ok().body(orderService.addProduct(product_id, order_id,request));
     }
 
+    @PostMapping("/orders/finalizeOrder/{orderId}/delivery/{deliveryId}")
+    public ResponseEntity<DeliveryResponseDTO> finalizeOrder(@PathVariable("orderId") int orderId, @PathVariable("deliveryId") int deliveryId, HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
+        return ResponseEntity.ok().body(orderService.finalizeOrder(orderId, deliveryId));
+    }
 
-    //-remove order
     @DeleteMapping("/orders/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {
-        LoginUtility.validateLogin(request);
+        SessionUtility.validateLogin(request);
         orderService.delete(id);
     }
-
-
-
 
 
 }
