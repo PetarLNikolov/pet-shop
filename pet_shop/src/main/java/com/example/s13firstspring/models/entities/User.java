@@ -32,12 +32,12 @@ public class User {
     private String phoneNumber;
     @Column
     private String password;
-    @JsonSerialize(using= LocalDateSerializer.class)
-    @JsonDeserialize(using= LocalDateDeserializer.class )
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private Date dateOfBirth;
     @Column
-    private boolean isAdmin=false; //TODO    (true - false to MySQL 0-1)
-    @OneToMany(mappedBy="user")
+    private boolean isAdmin = false; //TODO    (true - false to MySQL 0-1)
+    @OneToMany(mappedBy = "user")
     private Set<Review> reviews;
     @ManyToMany(mappedBy = "fans")
     private Set<Product> favouriteProducts;

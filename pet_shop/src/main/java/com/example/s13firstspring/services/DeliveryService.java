@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 
 @Service
@@ -32,16 +31,20 @@ public class DeliveryService {
         return mapper.map(d, DeliveryResponseDTO.class);
     }
 
-    public void delete(int id) {
-        if (deliveryRepository.getById(id) == null) {
-            throw new NotFoundException("Delivery not found");
-        }
-        deliveryRepository.deleteById(id);
+    public void deleteDelivery(int id) {
+        deliveryRepository.delete(deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found")));
+        //If needed orders can be deleted or safe deleted!
     }
 
-    public void sendDelivery(int id, HttpServletRequest request){
-
+    @Transactional
+    public String sendDelivery(int id, HttpServletRequest request) {
+        Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
+        //If needed orders can be deleted or safe deleted!
+        deleteDelivery(id);
+        String response="Your order is complete!"+" The totalAmount is:"+ d.getTotalCost();
+        return response;
     }
+
     public DeliveryResponseDTO getById(int id) {
         Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
         DeliveryResponseDTO dto = mapper.map(d, DeliveryResponseDTO.class);

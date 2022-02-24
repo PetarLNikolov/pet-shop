@@ -24,8 +24,6 @@ public class ProductAddDTO {
 
     private String description;
 
-    private LocalDateTime createdAt;
-
     private int discountId;
 
 }

@@ -25,7 +25,7 @@ public class SessionUtility {
     public static final String LAST_LOGIN = "last_login";
 
     public static void validateLogin(HttpServletRequest request) {
-        checkForInactivity(request);
+        //checkForInactivity(request);
 
         request.getSession().setAttribute(LAST_LOGIN, LocalDateTime.now());
         HttpSession s = request.getSession();

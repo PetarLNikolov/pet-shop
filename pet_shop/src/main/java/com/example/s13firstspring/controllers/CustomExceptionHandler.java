@@ -65,7 +65,7 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ErrorDTO handleAllOthers(Exception e) {
         ErrorDTO dto = new ErrorDTO();
-        dto.setMsg(e.getMessage());
+        dto.setMsg(e.getMessage()+" Internal!");
         dto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         return dto;
     }

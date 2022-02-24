@@ -10,5 +10,4 @@ public class BrandAddDTO {
 
     private String brandName;
 
-    private String logoURL;
 }

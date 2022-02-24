@@ -39,6 +39,7 @@ public class OrderService {
     @Autowired
     JdbcTemplate jdbcTemplate;
 
+
     @Autowired
     ModelMapper mapper;
     private SessionFactory sessionFactory;
@@ -59,8 +60,11 @@ public class OrderService {
     }
 
     @Transactional
-    public DeliveryResponseDTO finalizeOrder(int orderId, int deliveryId) {
+    public DeliveryResponseDTO finalizeOrder(int orderId, int deliveryId,HttpServletRequest request) {
         Order o = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
+        if(o.getDelivery()!=null){
+            throw new BadRequestException("This order is already in a delivery");
+        }
         Delivery d = new Delivery();
         if (deliveryRepository.findById(deliveryId).isPresent()) {
             d = deliveryRepository.getById(deliveryId);
@@ -70,11 +74,17 @@ public class OrderService {
         d.setEmail(u.getEmail());
         d.setLastName(u.getLastName());
         d.setPhoneNumber(u.getPhoneNumber());
+        d.setTotalCost(d.getTotalCost()+(Double)request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE));
+        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE,0);
         o.setDelivery(d);
         orderRepository.save(o);
-        deliveryRepository.save(d);
+
+        OrderAddDTO o1=new OrderAddDTO();
+        o1.setUserId(u.getId());
+        request.getSession().setAttribute(SessionUtility.ORDER_ID,add(o1,request));
+
         //TODO pitai zashto ne vrushta orederite pri wkarwane w delivery (wremeto za save e poveche ot vremeto za getbyID????)
-        return mapper.map(deliveryRepository.getById(d.getId()), DeliveryResponseDTO.class);
+        return mapper.map(deliveryRepository.save(d), DeliveryResponseDTO.class);
     }
 
 
@@ -86,6 +96,7 @@ public class OrderService {
         return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request, "remove");
     }
 
+    @Transactional
     public OrderWithProductAndUnitsDTO editProduct(int productId, int orderId, HttpServletRequest request, String addOrRemove) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
 

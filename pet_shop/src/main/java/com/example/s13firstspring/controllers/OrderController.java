@@ -55,7 +55,7 @@ public class OrderController {
     @PostMapping("/orders/finalizeOrder/{orderId}/delivery/{deliveryId}")
     public ResponseEntity<DeliveryResponseDTO> finalizeOrder(@PathVariable("orderId") int orderId, @PathVariable("deliveryId") int deliveryId, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
-        return ResponseEntity.ok().body(orderService.finalizeOrder(orderId, deliveryId));
+        return ResponseEntity.ok().body(orderService.finalizeOrder(orderId, deliveryId,request));
     }
 
     @DeleteMapping("/orders/delete/{id}")

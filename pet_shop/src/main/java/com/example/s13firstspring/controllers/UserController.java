@@ -36,8 +36,9 @@ public class UserController {
 
 
     @PostMapping("/users/login")
-    public UserResponseDTO login(@RequestBody UserLoginDTO user, HttpServletRequest request) {
+    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginDTO user, HttpServletRequest request) {
         User u = userService.login(user.getUsername(), user.getPassword());
+
         HttpSession session=request.getSession();
         session.setAttribute(SessionUtility.LOGGED, true);
         session.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
@@ -46,12 +47,13 @@ public class UserController {
         OrderAddDTO o=new OrderAddDTO();
         o.setUserId(u.getId());
         session.setAttribute(SessionUtility.ORDER_ID,orderService.add(o,request));
-        return modelMapper.map(u, UserResponseDTO.class);
+        return ResponseEntity.ok().body(modelMapper.map(u, UserResponseDTO.class));
     }
 
     @PostMapping("/users/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
         User u = userService.register(user, request);
+
         HttpSession session=request.getSession();
         session.setAttribute(SessionUtility.LOGGED, true);
         session.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
@@ -75,15 +77,23 @@ public class UserController {
     }
 
     @PostMapping("/users/logout")
-    public void logout(HttpSession session, HttpServletResponse response) {
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        SessionUtility.validateLogin(request);
+        HttpSession session=request.getSession();
         session.invalidate();
         deleteUserOrders(session);
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
 
     private void deleteUserOrders(HttpSession session) {
+        //TODO restore product to DB
         int userId= (int) session.getAttribute(SessionUtility.USER_ID);
         jdbcTemplate.update("DELETE ohp FROM orders_have_products AS ohp JOIN orders AS o ON o.id=ohp.order_id WHERE o.user_id=(?);", userId);
+    }
+    @DeleteMapping("/users/delete/{id}")
+    private void deleteUser(@PathVariable int id,HttpServletRequest request){
+        SessionUtility.validateLogin(request);
+        userService.delete(id);
     }
 
 

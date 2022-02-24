@@ -38,6 +38,7 @@ public class CategoryController {
     @DeleteMapping("/categories/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
         categoryService.delete(id);
     }
 

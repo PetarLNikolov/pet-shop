@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 public class ProductController {
@@ -35,7 +36,7 @@ public class ProductController {
     }
 
     @GetMapping("/products/{name}")
-    public ResponseEntity<ProductResponseDTO> searchByName(@PathVariable String name, HttpServletRequest request) {
+    public ResponseEntity<Set<ProductResponseDTO>> searchByName(@PathVariable String name, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok(service.getByName(name));
     }
@@ -65,7 +66,7 @@ public class ProductController {
         SessionUtility.isAdmin(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Deleted product: "+service.delete(id));
     }
-    @PutMapping("/products/edit/{id}")
+    @PutMapping("/products/edit/{id}")//TODO change product to productAddDTo- request body
     public ResponseEntity<ProductResponseDTO> edit(@PathVariable int id, @RequestBody Product product, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);

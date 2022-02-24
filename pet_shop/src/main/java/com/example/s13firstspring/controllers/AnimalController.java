@@ -14,16 +14,16 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class AnimalController {
 
-        @Autowired
-        private AnimalService service;
+    @Autowired
+    private AnimalService service;
 
-        @PostMapping("/animals/add")
-        public ResponseEntity<AnimalResponseDTO> addAnimal(@RequestBody AnimalAddDTO animal, HttpServletRequest request) {
-            SessionUtility.validateLogin(request);
-            SessionUtility.isAdmin(request);
+    @PostMapping("/animals/add")
+    public ResponseEntity<AnimalResponseDTO> addAnimal(@RequestBody AnimalAddDTO animal, HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
+        SessionUtility.isAdmin(request);
 
-            return ResponseEntity.ok(service.add(animal));
-        }
+        return ResponseEntity.ok(service.add(animal));
+    }
 
     @DeleteMapping("/animals/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {

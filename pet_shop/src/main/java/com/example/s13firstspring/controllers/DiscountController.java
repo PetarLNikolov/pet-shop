@@ -41,6 +41,7 @@ public class DiscountController {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
         discountService.delete(id);
+        request.getSession().invalidate();
     }
     //-send info about discount of liked product
 }

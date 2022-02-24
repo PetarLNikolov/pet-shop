@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+@RestController
 public class DeliveryController {
 
     @Autowired
@@ -27,11 +28,11 @@ public class DeliveryController {
     @DeleteMapping("/deliveries/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
-        deliveryService.delete(id);
+        deliveryService.deleteDelivery(id);
     }
     @PutMapping("/deliveries/send-delivery/{id}")
-    public void sendDelivery(@PathVariable int id,HttpServletRequest request){
+    public String sendDelivery(@PathVariable int id,HttpServletRequest request){
         SessionUtility.validateLogin(request);
-        deliveryService.sendDelivery(id,request);
+        return deliveryService.sendDelivery(id,request);
     }
 }

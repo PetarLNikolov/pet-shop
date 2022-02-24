@@ -21,7 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class ProductService {
@@ -55,7 +57,7 @@ public class ProductService {
         if (product.getUnitsInStock() < 0) {
             throw new BadRequestException("Product entity count lower than 0");
         }
-        Product p = mapper.map(product, Product.class);
+        Product p = mapper.map(product, Product.class);//TODO optimize with 1 request to DB
         Animal a = animalRepository.findById(product.getAnimalId()).orElseThrow(() -> new NotFoundException("Animal not found"));
         Subcategory s = subcategoryRepository.findById(product.getSubcategoryId()).orElseThrow(() -> new NotFoundException("Subcategory not found"));
         Brand b = brandRepository.findById(product.getBrandId()).orElseThrow(() -> new NotFoundException("Brand not found"));
@@ -71,16 +73,20 @@ public class ProductService {
         return mapper.map(p, ProductResponseDTO.class);
     }
 
-    public ProductResponseDTO getByName(String name) {
+    public Set<ProductResponseDTO> getByName(String name) {
         if (name == null || name.length() > 1000) {
             throw new BadRequestException("Name is mandatory and has less than 1000 characters");
         }
 
-        Product product = repository.findByNameContaining(name.replaceAll("\\s+", ""));
-        if (product == null) {
+        Set<Product> products = repository.findAllByNameContaining(name.replaceAll("\\s+", ""));
+        if (products == null) {
             throw new NotFoundException("Product not found");
         }
-        return mapper.map(product, ProductResponseDTO.class);
+        Set<ProductResponseDTO> products1=new HashSet<>();
+        for (Product product : products) {
+            products1.add(mapper.map(product,ProductResponseDTO.class));
+        }
+        return products1;
     }
 
     public String delete(int id) {
@@ -98,9 +104,9 @@ public class ProductService {
         }
         p.setUnitsInStock(updatedUnits);
         repository.save(p);
-        return p.getUnitsInStock();
+        return updatedUnits;
     }
-
+    //TODO add and remove are too similar optimize
     public Integer removeFromStock(int id, int units) {
         Product p = repository.getById(id);
         int updatedUnits = p.getUnitsInStock() - units;
@@ -110,7 +116,7 @@ public class ProductService {
         }
         p.setUnitsInStock(updatedUnits);
         repository.save(p);
-        return p.getUnitsInStock();
+        return updatedUnits;
     }
 
 
@@ -125,7 +131,7 @@ public class ProductService {
     public String uploadImage(MultipartFile file, HttpServletRequest request, int productID) {
         //By default, Java supports only these five formats for images: JPEG, PNG, BMP, WEBMP, GIF and exception handler
         // gets the msg from the null pointer exception if the file is not supported by java
-
+        //TODO MultipartResolver to filter size and type
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String name = System.nanoTime() + "." + extension;
         Files.copy(file.getInputStream(), new File("images" + File.separator + name).toPath());
@@ -157,7 +163,6 @@ public class ProductService {
     }
 
     public ProductResponseDTO findProductById(int id) {
-        System.out.println("id is" + id);
         return mapper.map(getById(id), ProductResponseDTO.class);
     }
 
@@ -168,7 +173,9 @@ public class ProductService {
 
     public ProductResponseDTO setDiscount(int productId, int discountId) {
         Product p = repository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
-        p.setDiscount(discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found")));
+        Discount d=discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found"));
+        p.setDiscount(d);
+        p.setDiscountPrice(p.getPrice() * (100 - d.getPercentDiscount()) / 100);
         return mapper.map(repository.save(p),ProductResponseDTO.class);
     }
 
