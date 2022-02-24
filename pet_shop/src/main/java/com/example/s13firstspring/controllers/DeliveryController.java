@@ -1,8 +1,7 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.dtos.DeliveryWithoutCityDTO;
-import com.example.s13firstspring.models.entities.Delivery;
-import com.example.s13firstspring.models.repositories.DeliveryRepository;
+import com.example.s13firstspring.models.dtos.DeliveryEditDTO;
+import com.example.s13firstspring.models.dtos.DeliveryResponseDTO;
 import com.example.s13firstspring.services.DeliveryService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,26 +15,23 @@ public class DeliveryController {
     @Autowired
     private DeliveryService deliveryService;
 
-    @Autowired
-    private DeliveryRepository deliveryRepository;
-
-    @PostMapping("/orders/add")
-    public ResponseEntity<DeliveryWithoutCityDTO> add(@RequestBody DeliveryWithoutCityDTO delivery, HttpServletRequest request) {
-        SessionUtility.validateLogin(request);
-        return ResponseEntity.ok(deliveryService.add(delivery));
-    }
 
     //-edit delivery
-    @PutMapping("/delivery/edit")
-    public ResponseEntity<Delivery> edit(@RequestBody Delivery delivery, HttpServletRequest request) {
+    @PutMapping("/deliveries/edit/{id}")
+    public ResponseEntity<DeliveryResponseDTO> edit(@RequestBody DeliveryEditDTO delivery, @RequestParam int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
-        return ResponseEntity.ok(deliveryService.edit(delivery));
+        return ResponseEntity.ok(deliveryService.edit(delivery,id));
     }
 
     //-remove delivery
-    @DeleteMapping("/delivery/delete/{id}")
+    @DeleteMapping("/deliveries/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         deliveryService.delete(id);
+    }
+    @PutMapping("/deliveries/send-delivery/{id}")
+    public void sendDelivery(@PathVariable int id,HttpServletRequest request){
+        SessionUtility.validateLogin(request);
+        deliveryService.sendDelivery(id,request);
     }
 }

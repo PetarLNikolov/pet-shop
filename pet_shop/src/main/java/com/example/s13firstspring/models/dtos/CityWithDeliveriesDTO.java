@@ -13,5 +13,5 @@ import java.util.Set;
 public class CityWithDeliveriesDTO implements Serializable {
     private long id;
     private String city_name;
-    private List<DeliveryWithoutCityDTO> deliveries;
+    private List<DeliveryResponseDTO> deliveries;
 }

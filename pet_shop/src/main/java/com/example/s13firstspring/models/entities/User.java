@@ -40,7 +40,8 @@ public class User {
     @OneToMany(mappedBy="user")
     private Set<Review> reviews;
     @ManyToMany(mappedBy = "fans")
-    Set<Product> favouriteProducts;
-
+    private Set<Product> favouriteProducts;
+    @Column
+    private String resetPasswordToken;
 
 }

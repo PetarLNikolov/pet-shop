@@ -1,5 +1,6 @@
 package com.example.s13firstspring;
 
+import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,9 +10,12 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Properties;
 
 @SpringBootApplication//(exclude = { SecurityAutoConfiguration.class })  // ако имаш грешка при request пробвай
@@ -33,6 +37,7 @@ public class S13FirstSpringApplication {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
     @Bean
     public JavaMailSender getJavaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();

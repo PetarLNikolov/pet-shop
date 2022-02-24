@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.text.Utilities;
 import javax.transaction.Transactional;
+import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,13 +44,13 @@ public class OrderService {
     private SessionFactory sessionFactory;
 
 
-    public OrderResponseDTO add(OrderAddDTO order, HttpServletRequest request) {
+    public int add(OrderAddDTO order, HttpServletRequest request) {
         User u = userRepository.findById(order.getUserId()).orElseThrow(() -> new NotFoundException("User not found"));
         Order o = new Order();
         o.setCreatedAt(LocalDateTime.now());
         o.setUser(u);
         request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, 0.00);
-        return mapper.map(orderRepository.save(o), OrderResponseDTO.class);
+        return orderRepository.save(o).getId();
     }
 
 
@@ -63,42 +65,72 @@ public class OrderService {
         if (deliveryRepository.findById(deliveryId).isPresent()) {
             d = deliveryRepository.getById(deliveryId);
         }
-        User u=o.getUser();
-        d.getOrders().add(o);
+        User u = o.getUser();
         d.setFirstName(u.getFirstName());
+        d.setEmail(u.getEmail());
         d.setLastName(u.getLastName());
         d.setPhoneNumber(u.getPhoneNumber());
+        o.setDelivery(d);
+        orderRepository.save(o);
         deliveryRepository.save(d);
-        //o.setDelivery(d);
-        return mapper.map(d, DeliveryResponseDTO.class);
+        //TODO pitai zashto ne vrushta orederite pri wkarwane w delivery (wremeto za save e poveche ot vremeto za getbyID????)
+        return mapper.map(deliveryRepository.getById(d.getId()), DeliveryResponseDTO.class);
     }
 
-    public OrderWithProductAndUnitsDTO addProduct(int productId, int orderId, HttpServletRequest request) {
+
+    public OrderWithProductAndUnitsDTO addProduct(int productId, HttpServletRequest request) {
+        return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request, "add");
+    }
+
+    public OrderWithProductAndUnitsDTO removeProduct(int productId, HttpServletRequest request) {
+        return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request, "remove");
+    }
+
+    public OrderWithProductAndUnitsDTO editProduct(int productId, int orderId, HttpServletRequest request, String addOrRemove) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
-        if (product.getUnitsInStock() == 0) {
-            throw new BadRequestException("Out of stock for product: " + product.getName());
+
+        Optional<Order> o = orderRepository.findById(orderId);
+        if (!o.isPresent()) {
+            int userId = (int) request.getSession().getAttribute(SessionUtility.USER_ID);
+            OrderAddDTO order = new OrderAddDTO();
+            order.setUserId(userId);
+            orderId = add(order, request);
         }
-        Order o = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
-
-
         OrdersHaveProductsKey ohpk = new OrdersHaveProductsKey(productId, orderId);
-        int units = 1;
 
+        int units = 1;
         Optional<OrdersHaveProducts> o2 = ordersHaveProductsRepository.findById(ohpk);
+        Product p1 = productRepository.getById(productId);
         if (o2.isPresent()) {
-            units += ordersHaveProductsRepository.getById(ohpk).getUnits();
-        } else {
-            OrdersHaveProducts ordersHaveProducts = new OrdersHaveProducts(ohpk, product, o, 0);
-            ordersHaveProductsRepository.save(ordersHaveProducts);
+            int helpUnits = o2.get().getUnits();
+            int unitsInStock = p1.getUnitsInStock();
+            if (addOrRemove.equals("add")) {
+                if (unitsInStock == 0) {
+                    throw new BadRequestException("No units of product left in store");
+                }
+                units = helpUnits + 1;
+                p1.setUnitsInStock(unitsInStock - 1);
+            } else {
+                if (helpUnits == 0) {
+                    throw new BadRequestException("No units of product left in order");
+                }
+                units = helpUnits - 1;
+                p1.setUnitsInStock(unitsInStock + 1);
+            }
         }
-        OrdersHaveProducts ohp = new OrdersHaveProducts(ohpk, product, o, units);
+
+        OrdersHaveProducts ohp = new OrdersHaveProducts(ohpk, product, o.get(), units);
         ordersHaveProductsRepository.save(ohp);
         OrderWithProductAndUnitsDTO orderResponse = new OrderWithProductAndUnitsDTO();
         orderResponse.setProductsInOrder(getOrder(orderId));
 
         Double price = product.getDiscountPrice();
         if (request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) != null) {
-            price += (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE);
+            if (addOrRemove.equals("add")) {
+                price = (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) + price;
+            } else {
+                price = (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) - price;
+            }
         }
         request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, price);
         orderResponse.setCost(price);

@@ -2,6 +2,7 @@ package com.example.s13firstspring.controllers;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
+import com.example.s13firstspring.exceptions.SessionTimeoutException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
 import com.example.s13firstspring.models.dtos.ErrorDTO;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,17 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         dto.setStatus(HttpStatus.NOT_FOUND.value());
         return dto;
     }
+    @ExceptionHandler(value = {SessionTimeoutException.class})
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public ErrorDTO handleSessionTimeoutException(Exception e) {
+        ErrorDTO dto = new ErrorDTO();
+        dto.setMsg(e.getMessage());
+        dto.setStatus(HttpStatus.FORBIDDEN.value());
+        return dto;
+    }
+
+
 
     @ExceptionHandler(value = {Exception.class})
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)

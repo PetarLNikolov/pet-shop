@@ -1,10 +1,11 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.dtos.UserLoginDTO;
-import com.example.s13firstspring.models.dtos.UserRegisterDTO;
-import com.example.s13firstspring.models.dtos.UserResponseDTO;
+import com.example.s13firstspring.models.dtos.*;
 
+import com.example.s13firstspring.models.entities.Order;
 import com.example.s13firstspring.models.entities.User;
+import com.example.s13firstspring.models.repositories.OrderRepository;
+import com.example.s13firstspring.services.OrderService;
 import com.example.s13firstspring.services.UserService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
@@ -30,10 +31,8 @@ public class UserController {
     private ModelMapper modelMapper;
     @Autowired
     JdbcTemplate jdbcTemplate;
-
-//    public static ResponseEntity<String> notifyDiscountChange(Discount discount) {
-//        return ResponseEntity.status(418).body("Your product is on sale  " + discount.getPercentDiscount() + " % OFF");
-//    }
+    @Autowired
+    OrderService orderService;
 
 
     @PostMapping("/users/login")
@@ -43,6 +42,10 @@ public class UserController {
         session.setAttribute(SessionUtility.LOGGED, true);
         session.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
         session.setAttribute(SessionUtility.IS_ADMIN, u.isAdmin());
+        session.setAttribute(SessionUtility.USER_ID,u.getId());
+        OrderAddDTO o=new OrderAddDTO();
+        o.setUserId(u.getId());
+        session.setAttribute(SessionUtility.ORDER_ID,orderService.add(o,request));
         return modelMapper.map(u, UserResponseDTO.class);
     }
 
@@ -53,6 +56,10 @@ public class UserController {
         session.setAttribute(SessionUtility.LOGGED, true);
         session.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
         session.setAttribute(SessionUtility.IS_ADMIN, u.isAdmin());
+        session.setAttribute(SessionUtility.USER_ID,u.getId());
+        OrderAddDTO o=new OrderAddDTO();
+        o.setUserId(u.getId());
+        session.setAttribute(SessionUtility.ORDER_ID,orderService.add(o,request));
         return ResponseEntity.ok(modelMapper.map(u, UserResponseDTO.class));
     }
 

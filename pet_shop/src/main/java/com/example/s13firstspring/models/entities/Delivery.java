@@ -26,8 +26,11 @@ public class Delivery {
     @Column(name = "last_name", nullable = false, length = 128)
     private String lastName;
 
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false, length = 128)
     private String phoneNumber;
+
+    @Column(name = "email", nullable = false, length = 128)
+    private String email;
 
     @Column(name = "region", length = 64)
     private String region;
@@ -51,8 +54,7 @@ public class Delivery {
     @Column(name = "needs_bill")
     private Boolean needsBill;
 
-    @Lob
-    @Column(name = "extra_infromation")
+    @Column(name = "extra_information")
     private String extraInformation;
 
     @OneToMany(mappedBy = "delivery")

@@ -8,10 +8,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.util.Optional;
-
-
 
 
 @Service
@@ -23,39 +22,30 @@ public class DeliveryService {
     @Autowired
     private DeliveryRepository deliveryRepository;
 
-    public DeliveryWithoutCityDTO add(DeliveryWithoutCityDTO delivery) {
-        //TODO Проверки
-        Delivery d =mapper.map(delivery,Delivery.class);
-        deliveryRepository.save(d);
-        return mapper.map(d, DeliveryWithoutCityDTO.class);
-    }
 
     @Transactional
-    public Delivery edit(Delivery delivery) {
-        Optional<Delivery> opt = deliveryRepository.findById( delivery.getId());
-        if (opt.isPresent()) {
-            deliveryRepository.save(delivery);
-            return delivery;
-        } else {
-            throw new NotFoundException("Delivery not found");
-        }
+    public DeliveryResponseDTO edit(DeliveryEditDTO delivery, int id) {
+        Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
+        d = mapper.map(delivery, Delivery.class);
+        d.setId(id);
+        deliveryRepository.save(d);
+        return mapper.map(d, DeliveryResponseDTO.class);
     }
 
     public void delete(int id) {
-        if (deliveryRepository.getById( id) == null) {
+        if (deliveryRepository.getById(id) == null) {
             throw new NotFoundException("Delivery not found");
         }
-        deliveryRepository.deleteById( id);
+        deliveryRepository.deleteById(id);
     }
 
-    public DeliveryWithoutCityDTO getById(int id) {
-        Optional<Delivery> opt = deliveryRepository.findById(id);
-        if (opt.isPresent()) {
-            Delivery d = opt.get();
-            DeliveryWithoutCityDTO dto = mapper.map(d, DeliveryWithoutCityDTO.class);
-            return dto;
-        } else {
-            throw new NotFoundException("Delivery not found");
-        }
+    public void sendDelivery(int id, HttpServletRequest request){
+
+    }
+    public DeliveryResponseDTO getById(int id) {
+        Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
+        DeliveryResponseDTO dto = mapper.map(d, DeliveryResponseDTO.class);
+        return dto;
+
     }
 }

@@ -11,6 +11,7 @@ import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -140,6 +141,25 @@ public class UserService {
         return mapper.map(repository.save(mapper.map(user, User.class)), UserResponseDTO.class);
     }
 
-
+//    public void updateResetPasswordToken(String token, String email){
+//        User u = repository.findByEmail(email);
+//        if (u != null) {
+//            u.setResetPasswordToken(token);
+//            repository.save(u);
+//        } else {
+//            throw new NotFoundException("Customer not found: " + email);
+//        }
+//    }
+//    public User getByResetPasswordToken(String token) {
+//        return repository.findByResetPasswordToken(token);
+//    }
+//    public void updatePassword(User u, String newPassword) {
+//        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//        String encodedPassword = passwordEncoder.encode(newPassword);
+//        u.setPassword(encodedPassword);
+//
+//        u.setResetPasswordToken(null);
+//        repository.save(u);
+//    }
 }
 

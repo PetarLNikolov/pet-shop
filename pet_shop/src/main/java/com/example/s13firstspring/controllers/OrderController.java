@@ -35,16 +35,21 @@ public class OrderController {
     private ModelMapper mapper;
 
 
-    @PostMapping("/orders/add")
-    public ResponseEntity<OrderResponseDTO> add(@RequestBody OrderAddDTO order, HttpServletRequest request) {
+//    public ResponseEntity<OrderResponseDTO> add(@RequestBody OrderAddDTO order, HttpServletRequest request) {
+//        SessionUtility.validateLogin(request);
+//        return ResponseEntity.ok(orderService.add(order, request));
+//    }
+
+    @PutMapping("/orders/addProduct/{productId}")
+    public ResponseEntity<OrderWithProductAndUnitsDTO> addProduct(@PathVariable("productId") int product_id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
-        return ResponseEntity.ok(orderService.add(order, request));
+        return ResponseEntity.ok().body(orderService.addProduct(product_id, request));
     }
 
-    @PutMapping("/orders/addProduct/{productId}/order/{orderId}")
-    public ResponseEntity<OrderWithProductAndUnitsDTO> addProduct(@PathVariable("productId") int product_id, @PathVariable("orderId") int order_id,  HttpServletRequest request) {
+    @PutMapping("/orders/removeProduct/{productId}")
+    public ResponseEntity<OrderWithProductAndUnitsDTO> removeProduct(@PathVariable("productId") int product_id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
-        return ResponseEntity.ok().body(orderService.addProduct(product_id, order_id,request));
+        return ResponseEntity.ok().body(orderService.removeProduct(product_id, request));
     }
 
     @PostMapping("/orders/finalizeOrder/{orderId}/delivery/{deliveryId}")
