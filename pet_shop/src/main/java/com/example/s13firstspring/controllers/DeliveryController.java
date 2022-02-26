@@ -31,8 +31,13 @@ public class DeliveryController {
         deliveryService.deleteDelivery(id);
     }
     @PutMapping("/deliveries/send-delivery/{id}")
-    public String sendDelivery(@PathVariable int id,HttpServletRequest request){
+    public ResponseEntity<String> sendDelivery(@PathVariable int id,HttpServletRequest request){
         SessionUtility.validateLogin(request);
-        return deliveryService.sendDelivery(id,request);
+        return ResponseEntity.ok().body(deliveryService.sendDelivery(id,request));
+    }
+    @GetMapping("/deliveries/{id}")
+    public ResponseEntity<DeliveryResponseDTO> getById(@PathVariable int id,HttpServletRequest request){
+        SessionUtility.validateLogin(request);
+        return ResponseEntity.ok().body(deliveryService.getById(id));
     }
 }

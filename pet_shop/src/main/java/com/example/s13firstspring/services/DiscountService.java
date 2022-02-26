@@ -17,10 +17,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
-import javax.mail.internet.MimeMessage;
 import javax.transaction.Transactional;
-import java.util.LinkedList;
-import java.util.Queue;
 
 @Service
 public class DiscountService {
@@ -37,11 +34,17 @@ public class DiscountService {
 
     @Transactional
     public Discount edit(DiscountAddDTO discount, int id) {
-        Discount d = repository.findById(id).orElseThrow(() -> new NotFoundException("Discount not found"));
-        validation(discount);
-        //TODO OPRAVI SI DISCOUNT DATE--- UNSUPORTED MEDIA TYPE
-        d = repository.save(mapper.map(discount, Discount.class));
 
+        Discount d=repository.findById(id).orElseThrow(()-> new NotFoundException("Discount not found"));
+        if (discount.getStartOfOffer().isAfter(discount.getEndOfOffer())) {
+            throw new BadRequestException("Discount dates are invalid");
+        }
+        if (discount.getPercentDiscount() <= 0 || discount.getPercentDiscount() >= 100) {
+            throw new BadRequestException("Discount percentage is invalid");
+        }
+
+        d=mapper.map(discount, Discount.class);
+        repository.save(d);
         notifyUsers(d);
         return d;
     }
@@ -49,7 +52,6 @@ public class DiscountService {
     private void notifyUsers(Discount discount) {
         int discount_id = discount.getId();
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT u.email AS emails,p.name AS product_name FROM users AS u INNER JOIN users_have_favourites AS uhf ON u.id=uhf.user_id INNER JOIN products AS p ON p.id=uhf.product_id INNER JOIN discounts AS d ON d.id=p.discount_id WHERE d.id=(?)", discount_id);
-        Queue<String> emails = new LinkedList<>();
         new Thread(() -> {
             while (rowSet.next()) {
                 String likerEmail = rowSet.getString("emails");
@@ -90,7 +92,7 @@ public class DiscountService {
         if (repository.findByName(discount.getName()) != null) {
             throw new BadRequestException("Discount name is taken");
         }
-        if (discount.getStartOfOffer().isAfter(discount.getEndOfOffer())) { // subject to change
+        if (discount.getStartOfOffer().isAfter(discount.getEndOfOffer())) {
             throw new BadRequestException("Discount dates are invalid");
         }
         if (discount.getPercentDiscount() <= 0 || discount.getPercentDiscount() >= 100) {

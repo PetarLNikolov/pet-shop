@@ -7,16 +7,19 @@ import com.example.s13firstspring.services.SubcategoryService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.constraints.NotBlank;
 
 @RestController  // controller + request body(for serialization to json of the HTTP response to the request)
-@RequestMapping("/subcategories")
+
 public class SubcategoryController {
 
     @Autowired
     private SubcategoryService subcategoryService;
+
 
 
     @PostMapping("/subcategories/add")
@@ -42,7 +45,8 @@ public class SubcategoryController {
     }
 
     @GetMapping("/subcategories/{id}")
-    public ResponseEntity<SubcategoryResponseDTO> getById(@PathVariable int id) {
+    public ResponseEntity<SubcategoryResponseDTO> getById(@PathVariable int id, HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
         return ResponseEntity.ok(subcategoryService.getById(id));
     }
 

@@ -1,12 +1,13 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.ReviewAddDTO;
+
 import com.example.s13firstspring.models.dtos.ReviewResponseDTO;
 import com.example.s13firstspring.services.ReviewService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,16 +20,12 @@ public class ReviewController {
     @Autowired
     ModelMapper mapper;
 
-    @PostMapping("/reviews/add")
-    public ReviewResponseDTO addReview(@RequestBody ReviewAddDTO review, HttpServletRequest request) {
-        SessionUtility.validateLogin(request);
-        return service.addReview(review);
-    }
+
 
     @GetMapping("/reviews/getByID/{id}")
-    public ReviewResponseDTO getByID(@PathVariable int id, HttpServletRequest request){
+    public ResponseEntity<ReviewResponseDTO> getByID(@PathVariable int id, HttpServletRequest request){
         SessionUtility.validateLogin(request);
-        return service.getByID(id);
+        return ResponseEntity.ok().body(service.getByID(id));
     }
 
 }

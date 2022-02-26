@@ -25,7 +25,7 @@ public class SubcategoryService {
 
     public SubcategoryResponseDTO add(SubcategoryAddDTO subcategory) {
         if (repository.findByName(subcategory.getName()) != null) {
-            throw new BadRequestException("Subcategory name already exists");
+            throw new BadRequestException("Subcategory name already exists" );
         }
         Subcategory s = new Subcategory();
         s.setName(subcategory.getName());
@@ -36,17 +36,16 @@ public class SubcategoryService {
 
     @Transactional
     public SubcategoryResponseDTO edit(Subcategory subcategory) {
-        repository.findById(subcategory.getId()).orElseThrow(() -> new NotFoundException("Subcategory not found"));
+        repository.findById(subcategory.getId()).orElseThrow(() -> new NotFoundException("Subcategory not found" ));
         repository.save(subcategory);
         return mapper.map(subcategory, SubcategoryResponseDTO.class);
     }
 
     public void delete(int id) {
-        repository.delete(repository.findById(id).orElseThrow(() -> new NotFoundException("Subcategory not found")));
+        repository.delete(repository.findById(id).orElseThrow(() -> new NotFoundException("Subcategory not found" )));
     }
 
     public SubcategoryResponseDTO getById(int id) {
-        return mapper.map(repository.save(repository.findById(id).orElseThrow(() -> new NotFoundException("Subcategory not found"))),
-                SubcategoryResponseDTO.class);
+        return mapper.map(repository.findById(id).orElseThrow(() -> new NotFoundException("Subcategory not found" )), SubcategoryResponseDTO.class);
     }
 }

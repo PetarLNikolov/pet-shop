@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 
 
 import javax.servlet.http.HttpServletRequest;
-import javax.swing.text.Utilities;
 import javax.transaction.Transactional;
-import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,9 +58,9 @@ public class OrderService {
     }
 
     @Transactional
-    public DeliveryResponseDTO finalizeOrder(int orderId, int deliveryId,HttpServletRequest request) {
+    public DeliveryResponseDTO finalizeOrder(int orderId, int deliveryId, HttpServletRequest request) {
         Order o = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("Order not found"));
-        if(o.getDelivery()!=null){
+        if (o.getDelivery() != null) {
             throw new BadRequestException("This order is already in a delivery");
         }
         Delivery d = new Delivery();
@@ -74,16 +72,16 @@ public class OrderService {
         d.setEmail(u.getEmail());
         d.setLastName(u.getLastName());
         d.setPhoneNumber(u.getPhoneNumber());
-        d.setTotalCost(d.getTotalCost()+(Double)request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE));
-        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE,0);
+        d.setTotalCost(d.getTotalCost() + (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE));
+        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, 0);
         o.setDelivery(d);
         orderRepository.save(o);
+        d.getOrders().add(o);
 
-        OrderAddDTO o1=new OrderAddDTO();
+        OrderAddDTO o1 = new OrderAddDTO();
         o1.setUserId(u.getId());
-        request.getSession().setAttribute(SessionUtility.ORDER_ID,add(o1,request));
+        request.getSession().setAttribute(SessionUtility.ORDER_ID, add(o1, request));
 
-        //TODO pitai zashto ne vrushta orederite pri wkarwane w delivery (wremeto za save e poveche ot vremeto za getbyID????)
         return mapper.map(deliveryRepository.save(d), DeliveryResponseDTO.class);
     }
 

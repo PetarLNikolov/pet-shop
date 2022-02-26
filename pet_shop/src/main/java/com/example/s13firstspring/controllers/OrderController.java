@@ -58,6 +58,7 @@ public class OrderController {
         return ResponseEntity.ok().body(orderService.finalizeOrder(orderId, deliveryId,request));
     }
 
+
     @DeleteMapping("/orders/delete/{id}")
     public void delete(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);

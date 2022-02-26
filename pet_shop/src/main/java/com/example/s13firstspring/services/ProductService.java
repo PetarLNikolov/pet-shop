@@ -4,26 +4,24 @@ package com.example.s13firstspring.services;
 import com.example.s13firstspring.controllers.ImageController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
+import com.example.s13firstspring.models.dtos.*;
 import com.example.s13firstspring.models.entities.*;
 import com.example.s13firstspring.models.repositories.*;
-import com.example.s13firstspring.models.dtos.ProductAddDTO;
-import com.example.s13firstspring.models.dtos.ProductResponseDTO;
+import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class ProductService {
@@ -45,6 +43,8 @@ public class ProductService {
     private BrandRepository brandRepository;
     @Autowired
     private DiscountRepository discountRepository;
+    @Autowired
+    private ReviewService reviewService;
 
     public ProductResponseDTO add(ProductAddDTO product) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -82,9 +82,9 @@ public class ProductService {
         if (products == null) {
             throw new NotFoundException("Product not found");
         }
-        Set<ProductResponseDTO> products1=new HashSet<>();
+        Set<ProductResponseDTO> products1 = new HashSet<>();
         for (Product product : products) {
-            products1.add(mapper.map(product,ProductResponseDTO.class));
+            products1.add(mapper.map(product, ProductResponseDTO.class));
         }
         return products1;
     }
@@ -106,6 +106,7 @@ public class ProductService {
         repository.save(p);
         return updatedUnits;
     }
+
     //TODO add and remove are too similar optimize
     public Integer removeFromStock(int id, int units) {
         Product p = repository.getById(id);
@@ -151,7 +152,8 @@ public class ProductService {
         return productsNew;
     }
 
-    public int addToFavourites(int productId, int userId) {
+    public int addToFavourites(int productId, HttpServletRequest request) {
+        int userId = (int) request.getSession().getAttribute(SessionUtility.USER_ID);
         Product p = getById(productId);
         User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
         if (u.getFavouriteProducts().contains(p)) {
@@ -173,10 +175,44 @@ public class ProductService {
 
     public ProductResponseDTO setDiscount(int productId, int discountId) {
         Product p = repository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
-        Discount d=discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found"));
+        Discount d = discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found"));
         p.setDiscount(d);
         p.setDiscountPrice(p.getPrice() * (100 - d.getPercentDiscount()) / 100);
-        return mapper.map(repository.save(p),ProductResponseDTO.class);
+        return mapper.map(repository.save(p), ProductResponseDTO.class);
     }
 
+    public Set<ProductResponseDTO> getTop10() {
+        Set<ProductResponseDTO> products = new HashSet<>();
+        repository.getTop10Products().stream().forEach((Product p) -> products.add(mapper.map(p, ProductResponseDTO.class)));
+        return products;
+    }
+
+    @Transactional
+    public ReviewResponseDTO addReview(int userId, int productId, int rating) {
+        ReviewAddDTO review = new ReviewAddDTO();
+        Product p = getById(productId);
+        User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found")); //this probably never throws
+        review.setProduct(p);
+        review.setUser(u);
+        review.setRating(rating);
+        review.setCreatedAt(LocalDateTime.now());
+        Review review1 = reviewService.addReview(review);
+        p.getReviews().add(review1);
+
+        ReviewResponseDTO r = new ReviewResponseDTO();
+        r.setProduct(mapper.map(p, ProductWithIdAndName.class));
+        UserWithNameAndIdDTO user = new UserWithNameAndIdDTO();
+        user.setId(u.getId());
+        user.setFullName(u.getFirstName() + u.getLastName());
+        r.setId(review1.getId());
+        r.setRating(review1.getRating());
+
+
+
+        Integer i = p.getReviews().stream().map(Review::getRating).reduce(0, Integer::sum);
+        int size = p.getReviews().size();
+        p.setRating((double) ((i + r.getRating()) / size));
+        repository.save(p);
+        return r;
+    }
 }

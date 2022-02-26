@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping
 public class CategoryController {
 
     @Autowired
@@ -43,7 +42,8 @@ public class CategoryController {
     }
 
     @GetMapping("/categories/{id}")
-    public ResponseEntity<CategoryWithSubcategoriesDTO> getById(@PathVariable int id) {
+    public ResponseEntity<CategoryWithSubcategoriesDTO> getById(@PathVariable int id,HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
         return ResponseEntity.ok(categoryService.getById(id));
     }
 }

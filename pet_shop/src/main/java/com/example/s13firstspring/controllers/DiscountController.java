@@ -7,6 +7,7 @@ import com.example.s13firstspring.models.entities.Discount;
 
 import com.example.s13firstspring.services.DiscountService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
+import jdk.jfr.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ public class DiscountController {
 
     //-add discount
     @PostMapping("/discounts/add")
+
     public ResponseEntity<DiscountResponseDTO> add(@RequestBody DiscountAddDTO discount, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
@@ -31,8 +33,7 @@ public class DiscountController {
     public ResponseEntity<Discount> edit(@PathVariable int id,@RequestBody DiscountAddDTO discount, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
-        Discount d = discountService.edit(discount,id);
-        return ResponseEntity.ok(d);
+        return ResponseEntity.ok(discountService.edit(discount,id));
     }
 
     //-remove discount
@@ -43,5 +44,5 @@ public class DiscountController {
         discountService.delete(id);
         request.getSession().invalidate();
     }
-    //-send info about discount of liked product
+
 }

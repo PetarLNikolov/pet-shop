@@ -41,7 +41,7 @@ public class Product {
     @Column
     private String description;
     @Column
-    private BigDecimal rating;
+    private Double rating;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "discount_id")
     private Discount discount;
@@ -55,11 +55,10 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> fans;
+    @OneToMany(mappedBy = "product")
+    private Set<Review> reviews;
 
     @OneToMany(mappedBy = "product")
     Set<OrdersHaveProducts> haveProducts=new HashSet<>();
 
-
-//    @ManyToMany(mappedBy = "products")
-//    Set<Order> orders;
 }
