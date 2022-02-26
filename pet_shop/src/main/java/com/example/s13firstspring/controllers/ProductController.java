@@ -1,12 +1,14 @@
 package com.example.s13firstspring.controllers;
 
 
+import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.models.dtos.*;
 import com.example.s13firstspring.models.entities.Product;
 import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.ProductService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,47 +28,47 @@ public class ProductController {
     private UserRepository userRepository;
 
 
-    @PostMapping("/products/add" )
+    @PostMapping("/products/add")
     public ResponseEntity<ProductResponseDTO> addProduct(@RequestBody ProductAddDTO product, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
         return ResponseEntity.ok(service.add(product));
     }
 
-    @GetMapping("/products/{name}" )
+    @GetMapping("/products/{name}")
     public ResponseEntity<Set<ProductResponseDTO>> searchByName(@PathVariable String name, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok(service.getByName(name));
     }
 
-    @GetMapping("/products/getById/{id}" )
+    @GetMapping("/products/getById/{id}")
     public ResponseEntity<ProductResponseDTO> getById(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok(service.findProductById(id));
     }
 
-    @PutMapping("/products/addUnits" )
-    public ResponseEntity<String> addUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
+    @PutMapping("/products/addUnits")
+    public ResponseEntity<ProductWithUnitsAndName> addUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
-        return ResponseEntity.ok("Units in stock: " + service.addToStock(product.getId(), product.getNumberOfProducts()));
+        return ResponseEntity.ok(service.addToStock(product.getId(), product.getNumberOfProducts()));
     }
 
-    @PutMapping("/products/removeUnits" )
-    public ResponseEntity<String> removeUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
+    @PutMapping("/products/removeUnits")
+    public ResponseEntity<ProductWithUnitsAndName> removeUnits(@RequestBody ProductEditUnitsDTO product, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
-        return ResponseEntity.ok("Units in stock:" + service.removeFromStock(product.getId(), product.getNumberOfProducts()));
+        return ResponseEntity.ok(service.removeFromStock(product.getId(), product.getNumberOfProducts()));
     }
 
-    @DeleteMapping("/products/delete/{id}" )
+    @DeleteMapping("/products/delete/{id}")
     public ResponseEntity<String> delete(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Deleted product: " + service.delete(id));
     }
 
-    @PutMapping("/products/edit/{id}" )//TODO change product to productAddDTo- request body
+    @PutMapping("/products/edit/{id}")//TODO change product to productAddDTo- request body
     public ResponseEntity<ProductResponseDTO> edit(@PathVariable int id, @RequestBody Product product, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
@@ -74,40 +76,48 @@ public class ProductController {
     }
 
     @SneakyThrows
-    @PostMapping("/products/uploadImage/{productID}" )
-    public ResponseEntity<String> uploadImage(@RequestParam(name = "file" ) MultipartFile file, HttpServletRequest request, @PathVariable int productID) {
+    @PostMapping("/products/uploadImage/{productID}")
+    public ResponseEntity<ImageWithoutProductDTO> uploadImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request, @PathVariable int productID) {
         SessionUtility.validateLogin(request);
+        //file is a MultipartFile
+        if (file.isEmpty()) {
+            throw new BadRequestException("File is empty");
+        }
+        Tika tika = new Tika();
+        String detectedType = tika.detect(file.getBytes());
+        if (!detectedType.matches("image.jfif|image.jpeg|image.pg|image.pjpeg|image.pjp|image.png|image.svg|image.webp")) {
+            throw new BadRequestException("File type not supported");
+        }
         return ResponseEntity.ok().body(service.uploadImage(file, request, productID));
     }
 
-    @GetMapping("/products/getAllByPrice" )
+    @GetMapping("/products/getAllByPrice")
     public ResponseEntity<List<ProductResponseDTO>> getAllByPrice(HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok().body(service.getAllByPrice());
     }
 
-    @PostMapping("/products/addToFavourite/{id}" )
-    public int addToFavourite(@PathVariable int id, HttpServletRequest request) {
+    @PostMapping("/products/addToFavourite/{id}")
+    public int addToFavourite(@PathVariable int id, HttpServletRequest request) { //TODO make it return Responseentity<dto>
         SessionUtility.validateLogin(request);
-
         return service.addToFavourites(id, request);
     }
 
-    @PutMapping("/products/setDiscount/{productId}/discount/{discountId}" )
+    @PutMapping("/products/setDiscount/{productId}/discount/{discountId}")
     public ResponseEntity<ProductResponseDTO> setDiscount(@PathVariable int productId, @PathVariable int discountId, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
         return ResponseEntity.ok().body(service.setDiscount(productId, discountId));
     }
 
-    @GetMapping("/products/getTop10" )
+    @GetMapping("/products/getTop10")
     public ResponseEntity<Set<ProductResponseDTO>> getTop10(HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok().body(service.getTop10());
     }
 
     @PostMapping("/products/{id}/review/{rating}")
-    public ResponseEntity<ReviewResponseDTO> addReview(@PathVariable int id , @PathVariable int rating, HttpServletRequest request) {
+    public ResponseEntity<ReviewResponseDTO> addReview(@PathVariable int id, @PathVariable int rating, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok().body(service.addReview((Integer) request.getSession().getAttribute(SessionUtility.USER_ID), id, rating));
     }

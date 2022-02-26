@@ -96,19 +96,19 @@ public class ProductService {
         return name;
     }
 
-    public Integer addToStock(int id, int units) {
+    public ProductWithUnitsAndName addToStock(int id, int units) {
         Product p = repository.getById(id);
         int updatedUnits = p.getUnitsInStock() + units;
         if (updatedUnits > 1000) {
             throw new BadRequestException("Exceeded stock space for product: " + p.getName() + " (over 1000 units)");
         }
         p.setUnitsInStock(updatedUnits);
-        repository.save(p);
-        return updatedUnits;
+
+        return mapper.map(repository.save(p),ProductWithUnitsAndName.class);
     }
 
     //TODO add and remove are too similar optimize
-    public Integer removeFromStock(int id, int units) {
+    public ProductWithUnitsAndName removeFromStock(int id, int units) {
         Product p = repository.getById(id);
         int updatedUnits = p.getUnitsInStock() - units;
         if (updatedUnits < 0) {
@@ -116,8 +116,7 @@ public class ProductService {
                     "Units in stock: " + p.getUnitsInStock());
         }
         p.setUnitsInStock(updatedUnits);
-        repository.save(p);
-        return updatedUnits;
+        return mapper.map(repository.save(p),ProductWithUnitsAndName.class);
     }
 
 
@@ -129,7 +128,7 @@ public class ProductService {
     }
 
     @SneakyThrows
-    public String uploadImage(MultipartFile file, HttpServletRequest request, int productID) {
+    public ImageWithoutProductDTO uploadImage(MultipartFile file, HttpServletRequest request, int productID) {
         //By default, Java supports only these five formats for images: JPEG, PNG, BMP, WEBMP, GIF and exception handler
         // gets the msg from the null pointer exception if the file is not supported by java
         //TODO MultipartResolver to filter size and type
@@ -140,7 +139,7 @@ public class ProductService {
         Image i = imageController.add(name, p);
         p.getImages().add(i);
         //repository.save(p);
-        return i.getImage_URL();
+        return mapper.map(i,ImageWithoutProductDTO.class);
     }
 
     public List<ProductResponseDTO> getAllByPrice() {

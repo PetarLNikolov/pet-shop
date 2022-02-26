@@ -2,6 +2,7 @@ package com.example.s13firstspring.services.utilities;
 
 import com.example.s13firstspring.exceptions.SessionTimeoutException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
+import com.example.s13firstspring.models.repositories.UserRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,6 +17,8 @@ public class SessionUtility {
 
     @Autowired
     JdbcTemplate jdbcTemplate;
+
+
     public static final String IS_ADMIN = "is_admin";
     public static final String LOGGED = "logged";
     public static final String LOGGED_FROM = "logged_from";
@@ -26,7 +29,6 @@ public class SessionUtility {
 
     public static void validateLogin(HttpServletRequest request) {
         //checkForInactivity(request);
-
         request.getSession().setAttribute(LAST_LOGIN, LocalDateTime.now());
         HttpSession s = request.getSession();
         if (s.isNew() ||
@@ -37,18 +39,6 @@ public class SessionUtility {
         }
     }
 
-    private static void checkForInactivity(HttpServletRequest request) {
-        if(LocalDateTime.now().minusHours(1).isBefore((ChronoLocalDateTime<?>) request.getSession().getAttribute(LAST_LOGIN))){
-            request.getSession().invalidate();
-            //TODO ask krasi it wants deleteUserOrders to be static and jdbctemplate doesnotlikeit(maybe autowire to u.repo or u.service)
-            //deleteUserOrders(request.getSession());
-            throw new SessionTimeoutException("You have been inactive for 1 hour, please log in again");
-        }
-    }
-//    private void deleteUserOrders(HttpSession session) {
-//        int userId= (int) session.getAttribute(SessionUtility.USER_ID);
-//        jdbcTemplate.update("DELETE ohp FROM orders_have_products AS ohp JOIN orders AS o ON o.id=ohp.order_id WHERE o.user_id=(?);", userId);
-//    }
 
     public static void isAdmin(HttpServletRequest request) {
         if(!(boolean) request.getSession().getAttribute(IS_ADMIN)){

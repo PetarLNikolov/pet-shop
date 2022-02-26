@@ -7,6 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 @Entity(name = "users")
 @NoArgsConstructor
 @Data
-public class User {
+public class  User {
 
 
     @Id
@@ -34,6 +35,7 @@ public class User {
     private String password;
     @JsonSerialize(using = LocalDateSerializer.class)
     @JsonDeserialize(using = LocalDateDeserializer.class)
+    @Column
     private Date dateOfBirth;
     @Column
     private boolean isAdmin = false; //TODO    (true - false to MySQL 0-1)
@@ -43,5 +45,8 @@ public class User {
     private Set<Product> favouriteProducts;
     @Column
     private String resetPasswordToken;
-
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    @Column
+    private LocalDateTime lastAction;
 }

@@ -37,12 +37,11 @@ public class DeliveryService {
     }
 
     @Transactional
-    public String sendDelivery(int id, HttpServletRequest request) {
+    public DeliveryResponseDTO sendDelivery(int id, HttpServletRequest request) {
         Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
         //If needed orders can be deleted or safe deleted!
         deleteDelivery(id);
-        String response="Your order is complete!"+" The totalAmount is:"+ d.getTotalCost();
-        return response;
+        return mapper.map(d,DeliveryResponseDTO.class);
     }
 
     public DeliveryResponseDTO getById(int id) {

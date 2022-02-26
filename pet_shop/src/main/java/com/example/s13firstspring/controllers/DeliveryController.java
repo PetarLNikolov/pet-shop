@@ -31,7 +31,7 @@ public class DeliveryController {
         deliveryService.deleteDelivery(id);
     }
     @PutMapping("/deliveries/send-delivery/{id}")
-    public ResponseEntity<String> sendDelivery(@PathVariable int id,HttpServletRequest request){
+    public ResponseEntity<DeliveryResponseDTO> sendDelivery(@PathVariable int id,HttpServletRequest request){
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok().body(deliveryService.sendDelivery(id,request));
     }

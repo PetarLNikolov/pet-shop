@@ -1,37 +1,23 @@
 package com.example.s13firstspring.services;
 
-import com.example.s13firstspring.controllers.ImageController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
-import com.example.s13firstspring.models.dtos.ProductAddDTO;
-import com.example.s13firstspring.models.dtos.ProductEditUnitsDTO;
 import com.example.s13firstspring.models.dtos.UserRegisterDTO;
 import com.example.s13firstspring.models.dtos.UserResponseDTO;
-import com.example.s13firstspring.models.entities.Order;
-import com.example.s13firstspring.models.entities.OrdersHaveProducts;
 import com.example.s13firstspring.models.entities.User;
-import com.example.s13firstspring.models.repositories.OrderRepository;
-import com.example.s13firstspring.models.repositories.OrdersHaveProductsRepository;
 import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PutMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.regex.Pattern;
 
 @Service
 public class UserService {
@@ -160,7 +146,7 @@ public class UserService {
 
     public void delete(int id) {
         User u = repository.findById(id).orElseThrow(() -> new NotFoundException("User not found" ));
-
+        //deletes all orders from the user (we can save them if needed just copy the deleteUserOrders(to delete order in session))
         SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT ohp.product_id AS productId,ohp.units AS units FROM orders_have_products AS ohp INNER JOIN orders AS o ON ohp.order_id = o.id WHERE o.user_id=(?)", u.getId());
         new Thread(() -> {
             while (rowSet.next()) {
@@ -173,18 +159,24 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUserOrders(HttpSession session) {
-        //TODO it works but is not optimized and orders are not being deleted from system easily added if needed
-        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT ohp.units AS in_order, ohp.product_id AS id,p.units_in_stock AS in_stock FROM orders_have_products AS ohp INNER JOIN products AS p ON ohp.product_id=p.id WHERE ohp.order_id=(?)", (Integer) session.getAttribute(SessionUtility.ORDER_ID));
+    public void restoreProductsOriginal(int id) {
+        //TODO it works but is not optimized and orders are not being deleted from system (easily added if needed)
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet("SELECT ohp.units AS in_order, ohp.product_id AS id,p.units_in_stock AS in_stock FROM orders_have_products AS ohp INNER JOIN products AS p ON ohp.product_id=p.id WHERE ohp.order_id=(?)", id);
         while (rowSet.next()){
             int unitsInOrder=rowSet.getInt("in_order");
             int unitsInStock=rowSet.getInt("in_stock");
             int productId= rowSet.getInt("id");
             jdbcTemplate.update("UPDATE products SET units_in_stock=(?) WHERE id=(?)",unitsInStock+unitsInOrder,productId);
-        }
+        }//TODO reset products in order
+        jdbcTemplate.update("UPDATE orders_have_products AS ohp  INNER JOIN products AS p ON ohp.product_id=p.id SET ohp.units=0 WHERE ohp.order_id=(?)", id);
+        // if needed this deletes the order (the order_id FK is on NO_Action on update)- in order to save the order for analysis
+        //jdbcTemplate.update("DELETE ohp.* FROM orders_have_products AS ohp JOIN orders AS o ON o.id=ohp.order_id WHERE o.user_id=(?);", id);
+    }
 
-        int userId = (int) session.getAttribute(SessionUtility.USER_ID);
-        jdbcTemplate.update("DELETE ohp.* FROM orders_have_products AS ohp JOIN orders AS o ON o.id=ohp.order_id WHERE o.user_id=(?);", userId);
+    public void logout(HttpServletRequest request,int id) {
+        HttpSession session = request.getSession();
+        restoreProductsOriginal(id);
+        session.invalidate();
     }
 
 
