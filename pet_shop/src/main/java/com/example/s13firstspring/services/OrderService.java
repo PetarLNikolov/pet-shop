@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -66,6 +67,7 @@ public class OrderService {
             throw new BadRequestException("This order is already in a delivery");
         }
         Delivery d = new Delivery();
+        d.setOrders(new ArrayList<>());
         if (deliveryRepository.findById(deliveryId).isPresent()) {
             d = deliveryRepository.getById(deliveryId);
         }
@@ -75,9 +77,10 @@ public class OrderService {
         d.setLastName(u.getLastName());
         d.setPhoneNumber(u.getPhoneNumber());
         d.setTotalCost(d.getTotalCost() + (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE));
-        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, 0);
+        request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, 0.0);
         o.setDelivery(d);
         orderRepository.save(o);
+
         d.getOrders().add(o);
 
         OrderAddDTO o1 = new OrderAddDTO();

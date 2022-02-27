@@ -15,8 +15,11 @@ import java.util.Set;
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     Set<Product> findAllByNameContaining(String name);
+
     Product findByName(String name);
+
     List<Product> findAllByOrderByPriceDesc();
+
     @Query(nativeQuery = true, value="SELECT p.* FROM products AS p ORDER BY p.rating DESC LIMIT 10")
     Set<Product> getTop10Products();
 }

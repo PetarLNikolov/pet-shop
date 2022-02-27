@@ -52,6 +52,8 @@ public class ProductService {
     private DiscountRepository discountRepository;
     @Autowired
     private ReviewService reviewService;
+    @Autowired
+    private DiscountService discountService;
 
     public ProductResponseDTO add(ProductAddDTO product) {
         mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -182,8 +184,12 @@ public class ProductService {
     public ProductResponseDTO setDiscount(int productId, int discountId) {
         Product p = repository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
         Discount d = discountRepository.findById(discountId).orElseThrow(() -> new NotFoundException("Discount not found"));
+        if(p.getDiscount().getId() == d.getId()){
+            throw new BadRequestException("Product "+p.getName()+" already has discount "+d.getName());
+        }
         p.setDiscount(d);
         p.setDiscountPrice(p.getPrice() * (100 - d.getPercentDiscount()) / 100);
+        discountService.notifyUsers(d);
         return mapper.map(repository.save(p), ProductResponseDTO.class);
     }
 
@@ -195,6 +201,9 @@ public class ProductService {
 
     @Transactional
     public ReviewResponseDTO addReview(int userId, int productId, int rating) {
+        if(rating<1||rating>5){
+            throw new BadRequestException("Rating must be 1-5");
+        }
         ReviewAddDTO review = new ReviewAddDTO();
         Product p = getById(productId);
         User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("user not found")); //this probably never throws
@@ -212,7 +221,6 @@ public class ProductService {
         user.setFullName(u.getFirstName() + u.getLastName());
         r.setId(review1.getId());
         r.setRating(review1.getRating());
-
 
 
         Integer i = p.getReviews().stream().map(Review::getRating).reduce(0, Integer::sum);
