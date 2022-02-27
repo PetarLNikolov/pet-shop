@@ -2,7 +2,8 @@ package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.*;
+import com.example.s13firstspring.models.dtos.subcategories.SubcategoryAddDTO;
+import com.example.s13firstspring.models.dtos.subcategories.SubcategoryResponseDTO;
 import com.example.s13firstspring.models.entities.Subcategory;
 import com.example.s13firstspring.models.repositories.CategoryRepository;
 import com.example.s13firstspring.models.repositories.SubcategoryRepository;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Service
 public class SubcategoryService {

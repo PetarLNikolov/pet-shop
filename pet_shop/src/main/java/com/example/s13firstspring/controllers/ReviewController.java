@@ -2,7 +2,7 @@ package com.example.s13firstspring.controllers;
 
 
 
-import com.example.s13firstspring.models.dtos.ReviewResponseDTO;
+import com.example.s13firstspring.models.dtos.reviews.ReviewResponseDTO;
 import com.example.s13firstspring.services.ReviewService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;

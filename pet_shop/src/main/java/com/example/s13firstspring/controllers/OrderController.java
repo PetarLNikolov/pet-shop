@@ -1,8 +1,8 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.*;
-import com.example.s13firstspring.models.entities.*;
+import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
+import com.example.s13firstspring.models.dtos.orders.OrderWithProductAndUnitsDTO;
 import com.example.s13firstspring.models.repositories.DeliveryRepository;
 import com.example.s13firstspring.models.repositories.OrderRepository;
 import com.example.s13firstspring.models.repositories.ProductRepository;
@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 @RestController
 public class OrderController {

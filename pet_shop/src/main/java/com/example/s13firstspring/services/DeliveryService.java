@@ -1,7 +1,8 @@
 package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.*;
+import com.example.s13firstspring.models.dtos.deliveries.DeliveryEditDTO;
+import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
 import com.example.s13firstspring.models.entities.Delivery;
 import com.example.s13firstspring.models.repositories.DeliveryRepository;
 import org.modelmapper.ModelMapper;

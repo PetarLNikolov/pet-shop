@@ -1,27 +1,23 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.dtos.*;
-
-import com.example.s13firstspring.models.entities.Order;
+import com.example.s13firstspring.models.dtos.orders.OrderAddDTO;
+import com.example.s13firstspring.models.dtos.users.UserLoginDTO;
+import com.example.s13firstspring.models.dtos.users.UserRegisterDTO;
+import com.example.s13firstspring.models.dtos.users.UserResponseDTO;
 import com.example.s13firstspring.models.entities.User;
-import com.example.s13firstspring.models.repositories.OrderRepository;
 import com.example.s13firstspring.services.OrderService;
 import com.example.s13firstspring.services.UserService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 public class UserController {

@@ -1,17 +1,16 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.*;
+import com.example.s13firstspring.models.dtos.subcategories.SubcategoryAddDTO;
+import com.example.s13firstspring.models.dtos.subcategories.SubcategoryResponseDTO;
 import com.example.s13firstspring.models.entities.Subcategory;
 import com.example.s13firstspring.services.SubcategoryService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotBlank;
 
 @RestController  // controller + request body(for serialization to json of the HTTP response to the request)
 

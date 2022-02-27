@@ -3,8 +3,8 @@ package com.example.s13firstspring.services;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
-import com.example.s13firstspring.models.dtos.UserRegisterDTO;
-import com.example.s13firstspring.models.dtos.UserResponseDTO;
+import com.example.s13firstspring.models.dtos.users.UserRegisterDTO;
+import com.example.s13firstspring.models.dtos.users.UserResponseDTO;
 import com.example.s13firstspring.models.entities.User;
 import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.utilities.SessionUtility;
@@ -140,7 +140,6 @@ public class UserService {
     @Transactional
     public UserResponseDTO edit(UserRegisterDTO user) {
         checkUser(user);
-
         return mapper.map(repository.save(mapper.map(user, User.class)), UserResponseDTO.class);
     }
 

@@ -2,7 +2,10 @@ package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.*;
+import com.example.s13firstspring.models.dtos.categories.CategoryAddDTO;
+import com.example.s13firstspring.models.dtos.categories.CategoryResponseDTO;
+import com.example.s13firstspring.models.dtos.categories.CategoryWithSubcategoriesDTO;
+import com.example.s13firstspring.models.dtos.subcategories.SubcategoryWithoutCategoryDTO;
 import com.example.s13firstspring.models.entities.Category;
 import com.example.s13firstspring.models.entities.Subcategory;
 import com.example.s13firstspring.models.repositories.CategoryRepository;

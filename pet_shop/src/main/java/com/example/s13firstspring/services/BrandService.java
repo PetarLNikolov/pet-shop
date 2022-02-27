@@ -1,16 +1,13 @@
 package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
-import com.example.s13firstspring.models.dtos.BrandAddDTO;
-import com.example.s13firstspring.models.dtos.BrandResponseDTO;
+import com.example.s13firstspring.models.dtos.brands.BrandAddDTO;
+import com.example.s13firstspring.models.dtos.brands.BrandResponseDTO;
 import com.example.s13firstspring.models.entities.Brand;
 import com.example.s13firstspring.models.repositories.BrandRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.time.LocalDateTime;
 
 @Service
 public class BrandService {

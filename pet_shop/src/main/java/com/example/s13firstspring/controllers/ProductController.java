@@ -3,6 +3,11 @@ package com.example.s13firstspring.controllers;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.models.dtos.*;
+import com.example.s13firstspring.models.dtos.products.ProductAddDTO;
+import com.example.s13firstspring.models.dtos.products.ProductEditUnitsDTO;
+import com.example.s13firstspring.models.dtos.products.ProductResponseDTO;
+import com.example.s13firstspring.models.dtos.products.ProductWithUnitsAndName;
+import com.example.s13firstspring.models.dtos.reviews.ReviewResponseDTO;
 import com.example.s13firstspring.models.entities.Product;
 import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.ProductService;

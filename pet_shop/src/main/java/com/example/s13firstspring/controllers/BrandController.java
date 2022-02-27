@@ -1,17 +1,14 @@
 package com.example.s13firstspring.controllers;
 
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.BrandAddDTO;
-import com.example.s13firstspring.models.dtos.BrandResponseDTO;
-import com.example.s13firstspring.models.entities.Image;
-import com.example.s13firstspring.models.entities.Product;
+import com.example.s13firstspring.models.dtos.brands.BrandAddDTO;
+import com.example.s13firstspring.models.dtos.brands.BrandResponseDTO;
 import com.example.s13firstspring.services.BrandService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
