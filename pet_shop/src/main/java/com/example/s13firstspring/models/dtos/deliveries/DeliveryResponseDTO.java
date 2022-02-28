@@ -8,17 +8,19 @@ import java.util.List;
 
 @Data
 public class DeliveryResponseDTO {
-    int id;
-    String firstName;
-    String lastName;
-    String phoneNumber;
-    String region;
-    int postCode;
-    CityWithoutDeliveriesDTO city;
-    int houseNumber;
-    int floor;
-    int apartmentNumber;
-    Boolean needsBill;
-    String extraInformation;
-    List<OrderResponseDTO> orders;
+    private int id;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
+    private String region;
+    private int postCode;
+    private double totalCost;
+
+    private CityWithoutDeliveriesDTO city;
+    private int houseNumber;
+    private int floor;
+    private int apartmentNumber;
+    private Boolean needsBill;
+    private String extraInformation;
+    private List<OrderResponseDTO> orders;
 }

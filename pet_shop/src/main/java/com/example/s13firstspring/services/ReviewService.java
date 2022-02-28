@@ -9,6 +9,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class ReviewService {
     @Autowired
@@ -19,6 +21,7 @@ public class ReviewService {
 
     public Review addReview(ReviewAddDTO review) {
         Review r = mapper.map(review, Review.class);
+        r.setCreatedAt(LocalDateTime.now());
         return repository.save(r);
     }
 

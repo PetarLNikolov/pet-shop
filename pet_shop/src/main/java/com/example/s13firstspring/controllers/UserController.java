@@ -34,48 +34,24 @@ public class UserController {
     OrderService orderService;
 
 
-    @PostMapping("/users/login" )
+    @PostMapping("/users/login")
     public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginDTO user, HttpServletRequest request) {
-        User u = userService.login(user.getUsername(), user.getPassword());
-
-        HttpSession session = request.getSession();
-        session.setAttribute(SessionUtility.LOGGED, true);  //TODO SessionUtility stuff in another method
-        session.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
-        session.setAttribute(SessionUtility.IS_ADMIN, u.isAdmin());
-        session.setAttribute(SessionUtility.USER_ID, u.getId());
-        OrderAddDTO o = new OrderAddDTO();
-        o.setUserId(u.getId());
-        session.setAttribute(SessionUtility.ORDER_ID, orderService.add(o, request));
+        User u = userService.login(user.getUsername(), user.getPassword(), request);
         return ResponseEntity.ok().body(modelMapper.map(u, UserResponseDTO.class));
     }
 
-    @PostMapping("/users/register" )
+    @PostMapping("/users/register")
     public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
         User u = userService.register(user, request);
-
-        HttpSession session = request.getSession();
-        session.setAttribute(SessionUtility.LOGGED, true);
-        session.setAttribute(SessionUtility.LOGGED_FROM, request.getRemoteAddr());
-        session.setAttribute(SessionUtility.IS_ADMIN, u.isAdmin());
-        session.setAttribute(SessionUtility.USER_ID, u.getId());
-        OrderAddDTO o = new OrderAddDTO();
-        o.setUserId(u.getId());
-        session.setAttribute(SessionUtility.ORDER_ID, orderService.add(o, request));
         return ResponseEntity.ok(modelMapper.map(u, UserResponseDTO.class));
     }
 
-    @GetMapping("/users/{id}" )
+    @GetMapping("/users/{id}")
     public ResponseEntity<UserResponseDTO> getById(@PathVariable int id) {
         return ResponseEntity.ok(userService.getById(id));
     }
 
-    @PutMapping("/users" )
-    public ResponseEntity<UserResponseDTO> edit(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
-        SessionUtility.validateLogin(request);
-        return ResponseEntity.ok(userService.edit(user));
-    }
-
-    @PostMapping("/users/logout" )
+    @PostMapping("/users/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         SessionUtility.validateLogin(request);
         userService.logout(request, (Integer) request.getSession().getAttribute(SessionUtility.USER_ID));
@@ -83,10 +59,17 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/users/delete/{id}" )
+    @DeleteMapping("/users/delete/{id}")
     private void deleteUser(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         userService.delete(id);
+    }
+
+
+    @PutMapping("/users" )
+    public ResponseEntity<UserResponseDTO> edit(@RequestBody UserRegisterDTO user, HttpServletRequest request) {
+        SessionUtility.validateLogin(request);
+        return ResponseEntity.ok(userService.edit(user,request));
     }
 
 

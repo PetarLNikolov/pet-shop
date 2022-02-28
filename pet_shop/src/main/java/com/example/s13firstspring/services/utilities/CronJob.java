@@ -7,6 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.swing.*;
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.util.List;
 
 @Component
 
-public class InactivityChecker {
+public class CronJob {
 
     @Autowired
     UserService userService;
@@ -31,7 +32,14 @@ public class InactivityChecker {
     SimpleDateFormat sdf =
             new SimpleDateFormat("\"yyyy-MM-dd HH:mm:ss\"");
 
-    @Scheduled(fixedRate = 1000*30)
+    @Scheduled(fixedRate = 1000 * 60 * 60 * 24)
+    public void deleteExpiredDiscounts() {
+        Date dt = Date.from(LocalDateTime.now().minusMinutes(60).toInstant(ZoneOffset.UTC));
+        String currentTime = sdf.format(dt);
+        jdbcTemplate.update("DELETE FROM discounts AS d WHERE d.end_of_offer<= "+ currentTime);
+    }
+
+    @Scheduled(fixedRate = 1000 * 60)
     public void logOutInactiveUsers() {
         Date dt = Date.from(LocalDateTime.now().minusMinutes(60).toInstant(ZoneOffset.UTC));
         String currentTime = sdf.format(dt);
@@ -50,6 +58,5 @@ public class InactivityChecker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 }

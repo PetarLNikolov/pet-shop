@@ -1,21 +1,23 @@
 package com.example.s13firstspring.models.dtos.deliveries;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 public class DeliveryEditDTO {
-    String firstName;
-    String lastName;
-    String phoneNumber;
-    String region;
-    int postCode;
-    int cityId;
-    int houseNumber;
-    int floor;
-    int apartmentNumber;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String phoneNumber;
+    private String region;
+    private int postCode;
+    private int cityId;
+    private int houseNumber;
+    private int floor;
+    private int apartmentNumber;
     Boolean needsBill;
-    String extraInformation;
-    List<Integer> ordersIds;
+    private String extraInformation;
+
 }

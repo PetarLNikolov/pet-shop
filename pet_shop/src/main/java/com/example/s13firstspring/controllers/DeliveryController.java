@@ -15,21 +15,15 @@ public class DeliveryController {
 
     @Autowired
     private DeliveryService deliveryService;
-
+    //TODO check for every request if the delivery is owned by the Session.utility,getuserid; (jdbctemplate- with 1 request)
 
     //-edit delivery
-    @PutMapping("/deliveries/edit/{id}")
-    public ResponseEntity<DeliveryResponseDTO> edit(@RequestBody DeliveryEditDTO delivery, @RequestParam int id, HttpServletRequest request) {
+    @PutMapping("/deliveries/edit/{id}")//TODO use typemapper
+    public ResponseEntity<DeliveryResponseDTO> edit(@RequestBody DeliveryEditDTO delivery, @PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok(deliveryService.edit(delivery,id));
     }
 
-    //-remove delivery
-    @DeleteMapping("/deliveries/delete/{id}")
-    public void delete(@PathVariable int id, HttpServletRequest request) {
-        SessionUtility.validateLogin(request);
-        deliveryService.deleteDelivery(id);
-    }
     @PutMapping("/deliveries/send-delivery/{id}")
     public ResponseEntity<DeliveryResponseDTO> sendDelivery(@PathVariable int id,HttpServletRequest request){
         SessionUtility.validateLogin(request);

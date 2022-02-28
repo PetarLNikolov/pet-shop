@@ -115,7 +115,7 @@ public class ProductController {
         return ResponseEntity.ok().body(service.setDiscount(productId, discountId));
     }
 
-    @GetMapping("/products/getTop10")
+    @GetMapping("/products/getTop10") //TODO use pagination
     public ResponseEntity<Set<ProductResponseDTO>> getTop10(HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         return ResponseEntity.ok().body(service.getTop10());

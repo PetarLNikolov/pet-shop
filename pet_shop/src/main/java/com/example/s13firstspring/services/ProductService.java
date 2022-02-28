@@ -221,6 +221,7 @@ public class ProductService {
         user.setFullName(u.getFirstName() + u.getLastName());
         r.setId(review1.getId());
         r.setRating(review1.getRating());
+        r.setCreatedAt(review1.getCreatedAt());
 
 
         Integer i = p.getReviews().stream().map(Review::getRating).reduce(0, Integer::sum);

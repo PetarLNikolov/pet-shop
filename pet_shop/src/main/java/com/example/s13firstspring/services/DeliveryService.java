@@ -4,6 +4,7 @@ import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.dtos.deliveries.DeliveryEditDTO;
 import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
 import com.example.s13firstspring.models.entities.Delivery;
+import com.example.s13firstspring.models.repositories.CityRepository;
 import com.example.s13firstspring.models.repositories.DeliveryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,26 +24,28 @@ public class DeliveryService {
     private DeliveryRepository deliveryRepository;
 
 
+    @Autowired
+    private CityRepository cityRepository;
+
     @Transactional
     public DeliveryResponseDTO edit(DeliveryEditDTO delivery, int id) {
         Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
+        Double cost=d.getTotalCost();
         d = mapper.map(delivery, Delivery.class);
         d.setId(id);
-        deliveryRepository.save(d);
-        return mapper.map(d, DeliveryResponseDTO.class);
+        d.setTotalCost(cost);
+        d.setCity(cityRepository.getById(delivery.getCityId()));
+
+        return mapper.map( deliveryRepository.save(d), DeliveryResponseDTO.class);
     }
 
-    public void deleteDelivery(int id) {
-        deliveryRepository.delete(deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found")));
-        //If needed orders can be deleted or safe deleted!
-    }
+
 
     @Transactional
     public DeliveryResponseDTO sendDelivery(int id, HttpServletRequest request) {
         Delivery d = deliveryRepository.findById(id).orElseThrow(() -> new NotFoundException("Delivery not found"));
         //If needed orders can be deleted or safe deleted!
-        deleteDelivery(id);
-        return mapper.map(d,DeliveryResponseDTO.class);
+        return mapper.map(d, DeliveryResponseDTO.class);
     }
 
     public DeliveryResponseDTO getById(int id) {

@@ -32,7 +32,7 @@ public class Delivery {
     @Column(name = "email", nullable = false, length = 128)
     private String email;
 
-    @Column(name = "total_cost", nullable = false)
+    @Column(name = "total_cost")
     private double totalCost;
 
     @Column(name = "region", length = 64)

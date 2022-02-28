@@ -82,6 +82,7 @@ public class OrderService {
         orderRepository.save(o);
 
         d.getOrders().add(o);
+        d.setTotalCost(Double.sum(d.getTotalCost(), (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE)));
 
         OrderAddDTO o1 = new OrderAddDTO();
         o1.setUserId(u.getId());
