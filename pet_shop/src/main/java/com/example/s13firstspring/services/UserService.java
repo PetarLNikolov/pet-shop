@@ -175,9 +175,9 @@ public class UserService {
             int productId = rowSet.getInt("id");
             jdbcTemplate.update("UPDATE products SET units_in_stock=(?) WHERE id=(?)", unitsInStock + unitsInOrder, productId);
         }
-        jdbcTemplate.update("UPDATE orders_have_products AS ohp  INNER JOIN products AS p ON ohp.product_id=p.id SET ohp.units=0 WHERE ohp.order_id=(?)", id);
-        //( order_id FK is on NO_Action on update ) //TODO add file to statistics and delete orders with no delivery (CronJob)
-        jdbcTemplate.update("DELETE ohp.* FROM orders_have_products AS ohp JOIN orders AS o ON o.id=ohp.order_id WHERE o.user_id=(?);", id);
+        jdbcTemplate.update("UPDATE orders_have_products AS ohp  INNER JOIN products AS p ON ohp.product_id=p.id SET ohp.units=0 WHERE order_id=(?)", id);
+        //TODO add file to statistics and delete orders with no delivery (CronJob)
+        jdbcTemplate.update("DELETE ohp.* FROM orders_have_products AS ohp JOIN orders AS o ON o.id=ohp.order_id WHERE o.id=(?);", id);
     }
 
     public void logout(HttpServletRequest request, int id) {
@@ -191,8 +191,10 @@ public class UserService {
         int id = (Integer) request.getSession().getAttribute(SessionUtility.USER_ID);
         User u = repository.findById(id).orElseThrow(() -> new NotFoundException("user not found"));
         checkUser(user);
+        Boolean isAdmin=u.isAdmin();
         u = mapper.map(user, User.class);
         u.setPassword(passwordEncoder.encode(user.getPassword()));
+        u.setAdmin(isAdmin);
         u.setId(id);
         return mapper.map(repository.save(u), UserResponseDTO.class);
     }

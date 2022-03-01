@@ -54,7 +54,7 @@ public class UserController {
     @PostMapping("/users/logout")
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         SessionUtility.validateLogin(request);
-        userService.logout(request, (Integer) request.getSession().getAttribute(SessionUtility.USER_ID));
+        userService.logout(request, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID));
         response.setStatus(HttpServletResponse.SC_ACCEPTED);
     }
 

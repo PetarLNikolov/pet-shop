@@ -36,6 +36,7 @@ public class CronJob {
     public void deleteExpiredDiscounts() {
         Date dt = Date.from(LocalDateTime.now().minusMinutes(60).toInstant(ZoneOffset.UTC));
         String currentTime = sdf.format(dt);
+        //set product discount price to price
         jdbcTemplate.update("DELETE FROM discounts AS d WHERE d.end_of_offer<= "+ currentTime);
     }
 
@@ -52,7 +53,7 @@ public class CronJob {
         FileWriter myWriter = null;
         try {
             myWriter = new FileWriter("logs"+ File.separator +"inactivity",true);
-            myWriter.write("Inactive users: "+userIds.size());
+            myWriter.write("\n Inactive users: "+userIds.size());
             myWriter.close();
 
         } catch (IOException e) {
