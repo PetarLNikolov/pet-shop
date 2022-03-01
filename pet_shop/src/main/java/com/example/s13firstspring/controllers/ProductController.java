@@ -1,19 +1,13 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.models.dtos.*;
-import com.example.s13firstspring.models.dtos.products.ProductAddDTO;
-import com.example.s13firstspring.models.dtos.products.ProductEditUnitsDTO;
-import com.example.s13firstspring.models.dtos.products.ProductResponseDTO;
-import com.example.s13firstspring.models.dtos.products.ProductWithUnitsAndName;
+import com.example.s13firstspring.models.dtos.products.*;
 import com.example.s13firstspring.models.dtos.reviews.ReviewResponseDTO;
 import com.example.s13firstspring.models.entities.Product;
-import com.example.s13firstspring.models.repositories.UserRepository;
 import com.example.s13firstspring.services.ProductService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;
-import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +23,7 @@ public class ProductController {
 
     @Autowired
     private ProductService service;
-    @Autowired
-    private UserRepository userRepository;
+
 
 
     @PostMapping("/products/add")
@@ -73,27 +66,18 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Deleted product: " + service.delete(id));
     }
 
-    @PutMapping("/products/edit/{id}")//TODO change product to productAddDTo- request body
+    @PutMapping("/products/edit/{id}")
     public ResponseEntity<ProductResponseDTO> edit(@PathVariable int id, @RequestBody Product product, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
         SessionUtility.isAdmin(request);
-        return ResponseEntity.ok(service.edit(product));
+        return ResponseEntity.ok(service.edit(product,id));
     }
 
     @SneakyThrows
     @PostMapping("/products/uploadImage/{productID}")
     public ResponseEntity<ImageWithoutProductDTO> uploadImage(@RequestParam(name = "file") MultipartFile file, HttpServletRequest request, @PathVariable int productID) {
         SessionUtility.validateLogin(request);
-        //file is a MultipartFile
-        if (file.isEmpty()) {
-            throw new BadRequestException("File is empty");
-        }
-        Tika tika = new Tika();
-        String detectedType = tika.detect(file.getBytes());
-        if (!detectedType.matches("image.jfif|image.jpeg|image.pg|image.pjpeg|image.pjp|image.png|image.svg|image.webp")) {
-            throw new BadRequestException("File type not supported");
-        }
-        return ResponseEntity.ok().body(service.uploadImage(file, request, productID));
+        return ResponseEntity.ok().body(service.uploadImage(file, productID));
     }
 
     @GetMapping("/products/getAllByPrice")
@@ -103,9 +87,9 @@ public class ProductController {
     }
 
     @PostMapping("/products/addToFavourite/{id}")
-    public int addToFavourite(@PathVariable int id, HttpServletRequest request) { //TODO make it return Responseentity<dto>
+    public ResponseEntity<ProductResponseAddToFavouritesDTO> addToFavourite(@PathVariable int id, HttpServletRequest request) { //TODO make it return Responseentity<dto>
         SessionUtility.validateLogin(request);
-        return service.addToFavourites(id, request);
+        return ResponseEntity.ok().body(service.addToFavourites(id, request));
     }
 
     @PutMapping("/products/setDiscount/{productId}/discount/{discountId}")

@@ -5,10 +5,7 @@ import com.example.s13firstspring.controllers.ImageController;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.models.dtos.*;
-import com.example.s13firstspring.models.dtos.products.ProductAddDTO;
-import com.example.s13firstspring.models.dtos.products.ProductResponseDTO;
-import com.example.s13firstspring.models.dtos.products.ProductWithIdAndName;
-import com.example.s13firstspring.models.dtos.products.ProductWithUnitsAndName;
+import com.example.s13firstspring.models.dtos.products.*;
 import com.example.s13firstspring.models.dtos.reviews.ReviewAddDTO;
 import com.example.s13firstspring.models.dtos.reviews.ReviewResponseDTO;
 import com.example.s13firstspring.models.dtos.users.UserWithNameAndIdDTO;
@@ -17,6 +14,7 @@ import com.example.s13firstspring.models.repositories.*;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.tika.Tika;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -129,18 +127,33 @@ public class ProductService {
     }
 
 
-    public ProductResponseDTO edit(Product p) {
-        Product p1 = repository.getById(p.getId());
+    public ProductResponseDTO edit(Product p,int id) {
+        Product p1 = repository.findById(id).orElseThrow(()->new NotFoundException("Product not found"));
+        Double discountedPrice= p1.getDiscountPrice();
+        Discount d= p1.getDiscount();
+        int id1=p1.getId();
+        p1=mapper.map(p,Product.class);
         p1.setDiscountPrice(p.getPrice() * (100 - p.getDiscount().getPercentDiscount()) / 100);
+        p1.setId(id1);
+        p1.setDiscount(d);
         repository.save(p1);
         return mapper.map(p1, ProductResponseDTO.class);
     }
 
     @SneakyThrows
-    public ImageWithoutProductDTO uploadImage(MultipartFile file, HttpServletRequest request, int productID) {
+    public ImageWithoutProductDTO uploadImage(MultipartFile file, int productID) {
+
+        //file is a MultipartFile
+        if (file.isEmpty()) {
+            throw new BadRequestException("File is empty");
+        }
+        Tika tika = new Tika();
+        String detectedType = tika.detect(file.getBytes());
+        if (!detectedType.matches("image.jfif|image.jpeg|image.pg|image.pjpeg|image.pjp|image.png|image.svg|image.webp")) {
+            throw new BadRequestException("File type not supported");
+        }
         //By default, Java supports only these five formats for images: JPEG, PNG, BMP, WEBMP, GIF and exception handler
         // gets the msg from the null pointer exception if the file is not supported by java
-        //TODO MultipartResolver to filter size and type
         String extension = FilenameUtils.getExtension(file.getOriginalFilename());
         String name = System.nanoTime() + "." + extension;
         Files.copy(file.getInputStream(), new File("images" + File.separator + name).toPath());
@@ -160,7 +173,7 @@ public class ProductService {
         return productsNew;
     }
 
-    public int addToFavourites(int productId, HttpServletRequest request) {
+    public ProductResponseAddToFavouritesDTO addToFavourites(int productId, HttpServletRequest request) {
         int userId = (int) request.getSession().getAttribute(SessionUtility.USER_ID);
         Product p = getById(productId);
         User u = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
@@ -169,7 +182,12 @@ public class ProductService {
         }
         p.getFans().add(u);
         repository.save(p);
-        return p.getFans().size();
+        ProductResponseAddToFavouritesDTO p1= new ProductResponseAddToFavouritesDTO();
+        p1.setFans(p.getFans().size());
+        p1.setId(p.getId());
+        p1.setName(p.getName());
+        p1.setRating(p.getRating());
+        return p1;
     }
 
     public ProductResponseDTO findProductById(int id) {
