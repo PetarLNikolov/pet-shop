@@ -1,8 +1,8 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.animals.AnimalAddDTO;
-import com.example.s13firstspring.models.dtos.animals.AnimalResponseDTO;
+import com.example.s13firstspring.modelsTests.dtos.animals.AnimalAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.animals.AnimalResponseDTO;
 import com.example.s13firstspring.services.AnimalService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;

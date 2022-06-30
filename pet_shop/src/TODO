@@ -1,0 +1,18 @@
+
+TESTING:
+    -productRepository
+    -reviewRepository
+    -subcategoryRepository
+    -userRepository
+    -cronJob
+
+DOCKER:
+
+
+OPTIMIZATION OF CODE:
+    -check for reusability
+    -deliveryService!! (possible dumb stuff)
+    -one place with too many DB requests not in batch
+
+LOGGING:
+    -setup the properties,dependencies etc.

@@ -1,8 +1,8 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.dtos.cities.CityAddDTO;
-import com.example.s13firstspring.models.dtos.cities.CityWithDeliveriesDTO;
-import com.example.s13firstspring.models.entities.City;
+import com.example.s13firstspring.modelsTests.dtos.cities.CityAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.cities.CityWithDeliveriesDTO;
+import com.example.s13firstspring.modelsTests.entities.City;
 import com.example.s13firstspring.services.CityService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -38,6 +38,8 @@ public class CronJob {
         String currentTime = sdf.format(dt);
         //set product discount price to price
         jdbcTemplate.update("DELETE FROM discounts AS d WHERE d.end_of_offer<= "+ currentTime);
+
+        //TODO add logging here
     }
 
     @Scheduled(fixedRate = 1000 * 60)
@@ -50,14 +52,6 @@ public class CronJob {
             userService.restoreProductsOriginal(userId);
         }
 
-        FileWriter myWriter = null;
-        try {
-            myWriter = new FileWriter("logs"+ File.separator +"inactivity",true);
-            myWriter.write("\n Inactive users: "+userIds.size());
-            myWriter.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //TODO Add logging here
     }
 }

@@ -1,8 +1,8 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.discounts.DiscountAddDTO;
-import com.example.s13firstspring.models.dtos.discounts.DiscountResponseDTO;
+import com.example.s13firstspring.modelsTests.dtos.discounts.DiscountAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.discounts.DiscountResponseDTO;
 
 import com.example.s13firstspring.services.DiscountService;
 import com.example.s13firstspring.services.utilities.SessionUtility;

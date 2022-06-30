@@ -1,16 +1,13 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
-import com.example.s13firstspring.models.dtos.orders.OrderWithProductAndUnitsDTO;
-import com.example.s13firstspring.models.repositories.DeliveryRepository;
-import com.example.s13firstspring.models.repositories.OrderRepository;
-import com.example.s13firstspring.models.repositories.ProductRepository;
+import com.example.s13firstspring.modelsTests.dtos.deliveries.DeliveryResponseDTO;
+import com.example.s13firstspring.modelsTests.dtos.orders.OrderWithProductAndUnitsDTO;
 import com.example.s13firstspring.services.OrderService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,16 +19,6 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private OrderRepository orderRepository;
-
-    @Autowired
-    private DeliveryRepository deliveryRepository;
-    @Autowired
-    private ModelMapper mapper;
 
 
 //    public ResponseEntity<OrderResponseDTO> add(@RequestBody OrderAddDTO order, HttpServletRequest request) {
@@ -59,9 +46,9 @@ public class OrderController {
 
 
     @DeleteMapping("/orders/delete/{id}")
-    public void delete(@PathVariable int id, HttpServletRequest request) {
+    public ResponseEntity<String> delete(@PathVariable int id, HttpServletRequest request) {
         SessionUtility.validateLogin(request);
-        orderService.delete(id);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body("Deleted product: " + orderService.delete(id));
     }
 
 

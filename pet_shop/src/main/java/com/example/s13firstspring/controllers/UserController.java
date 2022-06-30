@@ -1,10 +1,9 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.dtos.orders.OrderAddDTO;
-import com.example.s13firstspring.models.dtos.users.UserLoginDTO;
-import com.example.s13firstspring.models.dtos.users.UserRegisterDTO;
-import com.example.s13firstspring.models.dtos.users.UserResponseDTO;
-import com.example.s13firstspring.models.entities.User;
+import com.example.s13firstspring.modelsTests.dtos.users.UserLoginDTO;
+import com.example.s13firstspring.modelsTests.dtos.users.UserRegisterDTO;
+import com.example.s13firstspring.modelsTests.dtos.users.UserResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.User;
 import com.example.s13firstspring.services.OrderService;
 import com.example.s13firstspring.services.UserService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 @RestController
 public class UserController {

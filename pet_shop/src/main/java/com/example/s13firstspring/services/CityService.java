@@ -2,10 +2,10 @@ package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.cities.CityAddDTO;
-import com.example.s13firstspring.models.dtos.cities.CityWithDeliveriesDTO;
-import com.example.s13firstspring.models.entities.City;
-import com.example.s13firstspring.models.repositories.CityRepository;
+import com.example.s13firstspring.modelsTests.dtos.cities.CityAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.cities.CityWithDeliveriesDTO;
+import com.example.s13firstspring.modelsTests.entities.City;
+import com.example.s13firstspring.modelsTests.repositories.CityRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

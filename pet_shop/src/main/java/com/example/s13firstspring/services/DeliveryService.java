@@ -1,11 +1,11 @@
 package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.deliveries.DeliveryEditDTO;
-import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
-import com.example.s13firstspring.models.entities.Delivery;
-import com.example.s13firstspring.models.repositories.CityRepository;
-import com.example.s13firstspring.models.repositories.DeliveryRepository;
+import com.example.s13firstspring.modelsTests.dtos.deliveries.DeliveryEditDTO;
+import com.example.s13firstspring.modelsTests.dtos.deliveries.DeliveryResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.Delivery;
+import com.example.s13firstspring.modelsTests.repositories.CityRepository;
+import com.example.s13firstspring.modelsTests.repositories.DeliveryRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

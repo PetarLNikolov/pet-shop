@@ -1,10 +1,10 @@
 package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
-import com.example.s13firstspring.models.dtos.brands.BrandAddDTO;
-import com.example.s13firstspring.models.dtos.brands.BrandResponseDTO;
-import com.example.s13firstspring.models.entities.Brand;
-import com.example.s13firstspring.models.repositories.BrandRepository;
+import com.example.s13firstspring.modelsTests.dtos.brands.BrandAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.brands.BrandResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.Brand;
+import com.example.s13firstspring.modelsTests.repositories.BrandRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

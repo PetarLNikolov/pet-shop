@@ -2,11 +2,11 @@ package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
-import com.example.s13firstspring.models.dtos.orders.OrderAddDTO;
-import com.example.s13firstspring.models.dtos.orders.OrderWithProductAndUnitsDTO;
-import com.example.s13firstspring.models.entities.*;
-import com.example.s13firstspring.models.repositories.*;
+import com.example.s13firstspring.modelsTests.dtos.deliveries.DeliveryResponseDTO;
+import com.example.s13firstspring.modelsTests.dtos.orders.OrderAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.orders.OrderWithProductAndUnitsDTO;
+import com.example.s13firstspring.modelsTests.entities.*;
+import com.example.s13firstspring.modelsTests.repositories.*;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.hibernate.SessionFactory;
 import org.modelmapper.ModelMapper;
@@ -56,8 +56,10 @@ public class OrderService {
     }
 
 
-    public void delete(int id) {
-        orderRepository.delete(orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found")));
+    public String delete(int id) {
+        Order o = orderRepository.findById(id).orElseThrow(() -> new NotFoundException("Order not found"));
+        orderRepository.delete(o);
+        return o.getId().toString();
     }
 
     @Transactional
@@ -67,15 +69,18 @@ public class OrderService {
             throw new BadRequestException("This order is already in a delivery");
         }
         Delivery d = new Delivery();
-        d.setOrders(new ArrayList<>());
+        User u = o.getUser();
+
         if (deliveryRepository.findById(deliveryId).isPresent()) {
             d = deliveryRepository.getById(deliveryId);
+        } else {
+            d.setOrders(new ArrayList<>());
+            d.setFirstName(u.getFirstName());
+            d.setEmail(u.getEmail());
+            d.setLastName(u.getLastName());
+            d.setPhoneNumber(u.getPhoneNumber());
         }
-        User u = o.getUser();
-        d.setFirstName(u.getFirstName());
-        d.setEmail(u.getEmail());
-        d.setLastName(u.getLastName());
-        d.setPhoneNumber(u.getPhoneNumber());
+
         d.setTotalCost(d.getTotalCost() + (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE));
         request.getSession().setAttribute(SessionUtility.ORDER_FINAL_PRICE, 0.0);
         o.setDelivery(d);
@@ -93,17 +98,21 @@ public class OrderService {
 
 
     public OrderWithProductAndUnitsDTO addProduct(int productId, HttpServletRequest request) {
-        return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request, "add");
+        return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request, AddOrRemove.ADD);
+    }
+
+    public static enum AddOrRemove {
+        ADD,REMOVE
     }
 
     public OrderWithProductAndUnitsDTO removeProduct(int productId, HttpServletRequest request) {
-        return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request, "remove");
+        return editProduct(productId, (Integer) request.getSession().getAttribute(SessionUtility.ORDER_ID), request,AddOrRemove.REMOVE);
     }
 
     @Transactional
-    public OrderWithProductAndUnitsDTO editProduct(int productId, int orderId, HttpServletRequest request, String addOrRemove) {
+    public OrderWithProductAndUnitsDTO editProduct(int productId, int orderId, HttpServletRequest request, AddOrRemove addOrRemove) {
         Product product = productRepository.findById(productId).orElseThrow(() -> new NotFoundException("Product not found"));
-
+        boolean isAdd=AddOrRemove.ADD==addOrRemove;
         Optional<Order> o = orderRepository.findById(orderId);
         if (!o.isPresent()) {
             int userId = (int) request.getSession().getAttribute(SessionUtility.USER_ID);
@@ -119,7 +128,7 @@ public class OrderService {
         if (o2.isPresent()) {
             int helpUnits = o2.get().getUnits();
             int unitsInStock = p1.getUnitsInStock();
-            if (addOrRemove.equals("add")) {
+            if (isAdd) {
                 if (unitsInStock == 0) {
                     throw new BadRequestException("No units of product left in store");
                 }
@@ -141,7 +150,7 @@ public class OrderService {
 
         Double price = product.getDiscountPrice();
         if (request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) != null) {
-            if (addOrRemove.equals("add")) {
+            if (isAdd) {
                 price = (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) + price;
             } else {
                 price = (Double) request.getSession().getAttribute(SessionUtility.ORDER_FINAL_PRICE) - price;

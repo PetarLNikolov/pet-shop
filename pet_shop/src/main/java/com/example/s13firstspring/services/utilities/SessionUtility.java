@@ -1,8 +1,6 @@
 package com.example.s13firstspring.services.utilities;
 
-import com.example.s13firstspring.exceptions.SessionTimeoutException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
-import com.example.s13firstspring.models.repositories.UserRepository;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,7 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.time.LocalDateTime;
-import java.time.chrono.ChronoLocalDateTime;
 
 @Data
 public class SessionUtility {

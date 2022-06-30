@@ -1,10 +1,10 @@
 package com.example.s13firstspring.services;
 
 import com.example.s13firstspring.exceptions.NotFoundException;
-import com.example.s13firstspring.models.dtos.reviews.ReviewAddDTO;
-import com.example.s13firstspring.models.dtos.reviews.ReviewResponseDTO;
-import com.example.s13firstspring.models.entities.Review;
-import com.example.s13firstspring.models.repositories.ReviewRepository;
+import com.example.s13firstspring.modelsTests.dtos.reviews.ReviewAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.reviews.ReviewResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.Review;
+import com.example.s13firstspring.modelsTests.repositories.ReviewRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

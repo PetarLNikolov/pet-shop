@@ -3,11 +3,11 @@ package com.example.s13firstspring.services;
 import com.example.s13firstspring.exceptions.BadRequestException;
 import com.example.s13firstspring.exceptions.NotFoundException;
 import com.example.s13firstspring.exceptions.UnauthorizedException;
-import com.example.s13firstspring.models.dtos.orders.OrderAddDTO;
-import com.example.s13firstspring.models.dtos.users.UserRegisterDTO;
-import com.example.s13firstspring.models.dtos.users.UserResponseDTO;
-import com.example.s13firstspring.models.entities.User;
-import com.example.s13firstspring.models.repositories.UserRepository;
+import com.example.s13firstspring.modelsTests.dtos.orders.OrderAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.users.UserRegisterDTO;
+import com.example.s13firstspring.modelsTests.dtos.users.UserResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.User;
+import com.example.s13firstspring.modelsTests.repositories.UserRepository;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.transaction.Transactional;
-import java.net.http.HttpRequest;
 
 @Service
 public class UserService {

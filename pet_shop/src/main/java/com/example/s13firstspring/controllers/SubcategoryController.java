@@ -1,9 +1,9 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.subcategories.SubcategoryAddDTO;
-import com.example.s13firstspring.models.dtos.subcategories.SubcategoryResponseDTO;
-import com.example.s13firstspring.models.entities.Subcategory;
+import com.example.s13firstspring.modelsTests.dtos.subcategories.SubcategoryAddDTO;
+import com.example.s13firstspring.modelsTests.dtos.subcategories.SubcategoryResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.Subcategory;
 import com.example.s13firstspring.services.SubcategoryService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,10 +1,10 @@
 package com.example.s13firstspring.controllers;
 
 
-import com.example.s13firstspring.models.dtos.*;
-import com.example.s13firstspring.models.dtos.products.*;
-import com.example.s13firstspring.models.dtos.reviews.ReviewResponseDTO;
-import com.example.s13firstspring.models.entities.Product;
+import com.example.s13firstspring.modelsTests.dtos.*;
+import com.example.s13firstspring.modelsTests.dtos.products.*;
+import com.example.s13firstspring.modelsTests.dtos.reviews.ReviewResponseDTO;
+import com.example.s13firstspring.modelsTests.entities.Product;
 import com.example.s13firstspring.services.ProductService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import lombok.SneakyThrows;

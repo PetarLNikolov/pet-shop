@@ -1,7 +1,7 @@
 package com.example.s13firstspring.controllers;
 
-import com.example.s13firstspring.models.dtos.deliveries.DeliveryEditDTO;
-import com.example.s13firstspring.models.dtos.deliveries.DeliveryResponseDTO;
+import com.example.s13firstspring.modelsTests.dtos.deliveries.DeliveryEditDTO;
+import com.example.s13firstspring.modelsTests.dtos.deliveries.DeliveryResponseDTO;
 import com.example.s13firstspring.services.DeliveryService;
 import com.example.s13firstspring.services.utilities.SessionUtility;
 import org.springframework.beans.factory.annotation.Autowired;
